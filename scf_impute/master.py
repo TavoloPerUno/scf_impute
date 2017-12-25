@@ -3,8 +3,8 @@ import pandas as pd
 import argparse
 import sys
 import pickle
-from scf_impute import preprocess
-from scf_impute import impute
+import preprocess
+import impute
 
 parser = argparse.ArgumentParser(description='Impute SCF Data')
 
