@@ -35,6 +35,9 @@ def main(argv):
     if method == 'xgboost':
         dct_data['xgboost_imputed'] = impute.xgboost_impute(dct_data, dct_param)
 
+    if method == 'knn':
+        dct_data['knn_imputed'] = impute.knn_impute(dct_data, dct_param, 7)
+
     with open(os.path.join(dct_param['data'], 'output.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
