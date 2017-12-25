@@ -2,9 +2,10 @@ import os
 import pandas as pd
 import argparse
 import sys
+sys.path.append('../')
 import pickle
-import preprocess
-import impute
+from scf_impute import preprocess
+from scf_impute import impute
 
 parser = argparse.ArgumentParser(description='Impute SCF Data')
 
