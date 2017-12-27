@@ -44,6 +44,6 @@ def prepare(dct_data, dct_param):
     dct_data['lst_char_cols'] = lst_char_cols
     dct_data['lst_num_cols'] = lst_num_cols
     dct_data['lst_year_cols'] = lst_year_cols
-    dct_data['lst_skipped_cols'] = cols_to_drop
+    dct_data['lst_skipped_cols'] = list(cols_to_drop)
 
     return dct_data
