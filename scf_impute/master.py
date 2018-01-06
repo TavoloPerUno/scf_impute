@@ -21,7 +21,7 @@ def download_data():
 
     dct_data = dict()
     dct_data['df_orig_data'] = pd.read_csv(os.path.join(dct_param['data'], 'raw_2013.csv'))
-    dct_data['df_knn_imputed'] = pd.read_csv(os.path.join(dct_param['data'], 'knn_imputed.csv'))
+    # dct_data['df_knn_imputed'] = pd.read_csv(os.path.join(dct_param['data'], 'knn_imputed.csv'))
     dct_data['df_raw_data'] = pd.read_csv(os.path.join(dct_param['data'], 'raw_2013.csv'))
     dct_data['df_xvariables'] = pd.read_excel(os.path.join(dct_param['data'], 'xvariables-final.xlsx'))
 
