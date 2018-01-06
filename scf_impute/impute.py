@@ -39,7 +39,7 @@ def glrm_impute(dct_data, dct_param):
 
 
 
-    dat_list = [np_num, np.char]
+    dat_list = [np_num, np_char]
     loss_list = [QuadraticLoss, HingeLoss]
     regX, regY = QuadraticReg(0.1), QuadraticReg(0.1)
     missing_list = [lst_missing_num, lst_missing_char]
