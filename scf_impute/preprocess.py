@@ -46,4 +46,11 @@ def prepare(dct_data, dct_param):
     dct_data['lst_year_cols'] = lst_year_cols
     dct_data['lst_skipped_cols'] = list(cols_to_drop)
 
+    df_col_structure = pd.DataFrame({'char_col': ','.join(lst_char_cols),
+                                     'num_col': ','.join(lst_num_cols),
+                                     'year_col': ','.join(lst_year_cols),
+                                     'skip_col': ','.join(list(cols_to_drop))}, index=[0])
+
+    df_col_structure.to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)
+
     return dct_data
