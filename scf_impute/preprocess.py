@@ -1,15 +1,70 @@
 import os
+import re
+import sklearn.model_selection
 import pandas as pd
 import numpy as np
-import re
+import random
+import itertools
+
+def key_val_products(dicts):
+    return ([item for sublist in [list(itertools.product([k], dicts[k])) for k in list(dicts.keys())] for item in sublist])
 
 def pythonize_colnames(df):
     df.columns = list(map(lambda each:re.sub('[^0-9a-zA-Z]+', '_', each).lower(), df.columns))
 
+
+def track_holdout(dct_data, dct_param):
+    df_raw_data = dct_data['df_raw_data']
+
+
+    train_id, test_id = sklearn.model_selection.train_test_split(df_raw_data.index, train_size=0.8, random_state=10)
+
+
+
+    # 1. Read a row
+    # 2. Pick 10 or less numeric values that exist
+    # 3. Record the row number and associated 10 or less columns
+    # 4. Make the 10 or less numeric values missing
+    # 5. Next row
+
+    dct_removed = {}
+
+    for i in test_id:
+        # Select a row
+        row = df_raw_data.loc[i,]
+
+        # Find columns with data
+        existing_columns = row.index[row.notnull()]
+
+        # Miniumum of length of existing columns or 10
+        num_valuesdropped = min(len(existing_columns), 10)
+
+        # Create list of indices and then randomly select values that will be dropped for analysis
+        existing_columns_indices = list(range(len(existing_columns)))
+        random.seed(10 + i)
+        columns_dropped = existing_columns[random.sample(existing_columns_indices, num_valuesdropped)]
+
+        dct_removed[i] = columns_dropped
+
+    dct_data['df_full_cleaned_data'] = df_raw_data
+    for row_id in list(dct_removed.keys()):
+        df_raw_data.ix[row_id, dct_removed[row_id]] = np.nan
+
+    holdout_idx = key_val_products(dct_removed)
+
+    dct_data['df_raw_data'] = df_raw_data
+
+    dct_data['dct_removed'] = dct_removed
+    dct_data['holdout_idx'] = holdout_idx
+
+
+    return dct_data
+
 def prepare(dct_data, dct_param):
 
     df_raw_data = dct_data['df_raw_data']
-    del df_raw_data['Unnamed: 0']
+    if 'Unnamed: 0' in df_raw_data.columns:
+        del df_raw_data['Unnamed: 0']
     df_raw_data = df_raw_data.loc[df_raw_data['yy1'] != 0,]
     df_raw_data.set_index('yy1', inplace=True)
 
@@ -53,4 +108,4 @@ def prepare(dct_data, dct_param):
 
     df_col_structure.to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)
 
-    return dct_data
+    return track_holdout(dct_data, dct_param)
