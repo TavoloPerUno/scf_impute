@@ -36,6 +36,8 @@ def track_holdout(dct_data, dct_param):
         # Find columns with data
         existing_columns = row.index[row.notnull()]
 
+        existing_columns = pd.Index([col for col in existing_columns if col in dct_data['lst_char_cols'] + dct_data['lst_num_cols']])
+
         # Miniumum of length of existing columns or 10
         num_valuesdropped = min(len(existing_columns), 10)
 
@@ -87,7 +89,7 @@ def prepare(dct_data, dct_param):
     for yr_col in lst_year_cols:
         df_raw_data[yr_col] = df_raw_data[yr_col].fillna(df_xvariables.loc[df_xvariables['x']==yr_col,'na_code'].values[0])
 
-    df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
+
 
     cols = list(df_raw_data)
     nunique = df_raw_data.apply(pd.Series.nunique)
@@ -108,4 +110,10 @@ def prepare(dct_data, dct_param):
 
     df_col_structure.to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)
 
-    return track_holdout(dct_data, dct_param)
+    dct_data = track_holdout(dct_data, dct_param)
+
+    lst_char_cols = [col for col in lst_char_cols if col in df_raw_data]
+
+    df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
+
+    return dct_data

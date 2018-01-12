@@ -7,7 +7,7 @@ from glrm.glrm import GLRM
 from glrm.loss import QuadraticLoss, HingeLoss
 from glrm.reg import QuadraticReg
 from glrm.convergence import Convergence
-import scipy.sparse as sp
+from sklearn.preprocessing import MaxAbsScaler
 from predictive_imputer import predictive_imputer
 # from fancyimpute import BiScaler, KNN, NuclearNormMinimization, SoftImpute
 
@@ -20,10 +20,12 @@ def rforest_impute(dct_data, dct_param):
 
 def xgboost_impute(dct_data, dct_param):
     df_raw_data = dct_data['df_raw_data']
+    for char_col in dct_data['lst_char_cols']:
+        if char_col in df_raw_data.columns:
+            df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
 
     imputer = DefaultImputer(missing_string_marker='nan')  # treat 'UNKNOWN' as missing value
     filled_in = imputer.fit(df_raw_data).transform(df_raw_data)
-
     return filled_in
 
 def glrm_impute(dct_data, dct_param):
