@@ -116,4 +116,6 @@ def prepare(dct_data, dct_param):
 
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
 
+    dct_data['df_raw_data'] = df_raw_data
+
     return dct_data
