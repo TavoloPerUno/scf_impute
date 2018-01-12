@@ -39,7 +39,7 @@ def track_holdout(dct_data, dct_param):
         existing_columns = pd.Index([col for col in existing_columns if col in dct_data['lst_char_cols'] + dct_data['lst_num_cols']])
 
         # Miniumum of length of existing columns or 10
-        num_valuesdropped = min(len(existing_columns), 10)
+        num_valuesdropped = min(len(existing_columns) - 5, 10)
 
         # Create list of indices and then randomly select values that will be dropped for analysis
         existing_columns_indices = list(range(len(existing_columns)))
@@ -52,7 +52,20 @@ def track_holdout(dct_data, dct_param):
     for row_id in list(dct_removed.keys()):
         df_raw_data.ix[row_id, dct_removed[row_id]] = np.nan
 
+    nunique = df_raw_data.apply(pd.Series.nunique)
+    empty_cols = list(nunique[nunique == 1].index)
+
+    empty_cols.extend(df_raw_data.columns[df_raw_data.isnull().all()].tolist())
+    df_raw_data = df_raw_data.dropna(axis=1, how='all')
+
+    for k in dct_removed:
+        dct_removed[k] = [col for col in dct_removed[k] if col not in empty_cols]
+
+    df_raw_data[empty_cols] = dct_data['df_full_cleaned_data'][empty_cols]
+
     holdout_idx = key_val_products(dct_removed)
+
+    df_raw_data.to_csv('test.csv')
 
     dct_data['df_raw_data'] = df_raw_data
 
@@ -91,17 +104,19 @@ def prepare(dct_data, dct_param):
 
 
 
-    cols = list(df_raw_data)
+
     nunique = df_raw_data.apply(pd.Series.nunique)
     cols_to_drop = nunique[nunique == 1].index
     df_raw_data.drop(cols_to_drop, axis=1, inplace=True)
-
+    skip_cols = list(cols_to_drop)
+    skip_cols.extend(df_raw_data.columns[df_raw_data.isnull().all()].tolist())
+    df_raw_data = df_raw_data.dropna(axis=1, how='all')
     dct_data['df_raw_data'] = df_raw_data
     dct_data['df_xvariables'] = df_xvariables
     dct_data['lst_char_cols'] = lst_char_cols
     dct_data['lst_num_cols'] = lst_num_cols
     dct_data['lst_year_cols'] = lst_year_cols
-    dct_data['lst_skipped_cols'] = list(cols_to_drop)
+    dct_data['lst_skipped_cols'] = skip_cols
 
     df_col_structure = pd.DataFrame({'char_col': ','.join(lst_char_cols),
                                      'num_col': ','.join(lst_num_cols),
