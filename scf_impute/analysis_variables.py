@@ -384,6 +384,7 @@ def get_networth(row):
     row['networth'] = networth
     row['agecl'] = agecl
     row['race'] = race
+    row['hhsex'] = hhsex
     row['hdebt'] = hdebt
 
     return row

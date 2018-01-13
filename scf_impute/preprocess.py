@@ -1,16 +1,9 @@
 import os
-import re
 import sklearn.model_selection
 import pandas as pd
 import numpy as np
 import random
-import itertools
-
-def key_val_products(dicts):
-    return ([item for sublist in [list(itertools.product([k], dicts[k])) for k in list(dicts.keys())] for item in sublist])
-
-def pythonize_colnames(df):
-    df.columns = list(map(lambda each:re.sub('[^0-9a-zA-Z]+', '_', each).lower(), df.columns))
+from scf_impute import  util
 
 
 def track_holdout(dct_data, dct_param):
@@ -63,13 +56,18 @@ def track_holdout(dct_data, dct_param):
 
     df_raw_data[empty_cols] = dct_data['df_full_cleaned_data'][empty_cols]
 
-    holdout_idx = key_val_products(dct_removed)
+    holdout_idx = util.key_val_products(dct_removed)
 
     df_raw_data.to_csv('test.csv')
 
     dct_data['df_raw_data'] = df_raw_data
 
-    dct_data['dct_removed'] = dct_removed
+    dct_removed = util.reverse_map(dct_removed)
+
+    for k in dct_removed.keys():
+        dct_removed[k] = ",".join(map(str, dct_removed[k]))
+
+    dct_data['df_removed'] = pd.DataFrame(dct_removed, index=[0])
     dct_data['holdout_idx'] = holdout_idx
 
 
@@ -85,7 +83,7 @@ def prepare(dct_data, dct_param):
 
     df_xvariables = dct_data['df_xvariables']
 
-    pythonize_colnames(df_xvariables)
+    util.pythonize_colnames(df_xvariables)
     df_xvariables['na_code'] = df_xvariables['na_code'].fillna(0)
 
     df_raw_data = df_raw_data[list(filter(lambda x: x.startswith('x') and

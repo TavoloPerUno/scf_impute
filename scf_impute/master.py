@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(description='Impute SCF Data')
 # Required positional argument
 parser.add_argument('method', type=str,
                     help='method')
+parser.add_argument('--iter', type=int,
+                    help='n_run', default=1, dest='nrun')
 
 dct_param = {'data': os.path.join('..', 'data'),
              'missing_val': 'nan'}
@@ -32,6 +34,7 @@ def main(argv):
 
     args = parser.parse_args()
     method = args.method
+    nrun = args.nrun
 
     dct_data = dict()
 
@@ -69,17 +72,23 @@ def main(argv):
     # df_xgboost_data.to_csv(os.path.join(dct_param['data'], 'xgboost_imputed_analysis.csv'), index=False)
 
     if method == 'xgboost':
-        dct_data['xgboost_imputed'] = impute.xgboost_impute(dct_data, dct_param)
+        df_imputed = impute.xgboost_impute(dct_data, dct_param)
+
 
     if method == 'knn':
-        dct_data['knn_imputed'] = impute.knn_impute(dct_data, dct_param, 7)
+        df_imputed = impute.knn_impute(dct_data, dct_param, 7)
 
     if method == 'rforest':
-        dct_data['rforest_imputed'] = impute.rforest_impute(dct_data, dct_param)
+        df_imputed = impute.rforest_impute(dct_data, dct_param)
 
     if method == 'glrm':
-        dct_data['glrm_imputed'] = impute.glrm_impute(dct_data, dct_param)
+        df_imputed = impute.glrm_impute(dct_data, dct_param)
 
+    df_imputed = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
+    dct_data[method + '_imputed'] = df_imputed
+    df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=False)
+
+    dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
     with open(os.path.join(dct_param['data'], 'results.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
