@@ -71,6 +71,7 @@ def main(argv):
     # df_knn_data.to_csv(os.path.join(dct_param['data'], 'knn_imputed_analysis.csv'), index=False)
     # df_xgboost_data.to_csv(os.path.join(dct_param['data'], 'xgboost_imputed_analysis.csv'), index=False)
 
+    df_imputed = ''
     if method == 'xgboost':
         df_imputed = impute.xgboost_impute(dct_data, dct_param)
 
