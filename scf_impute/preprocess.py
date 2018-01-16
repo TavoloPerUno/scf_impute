@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import random
 from scf_impute import  util
+import math
 
 
 def track_holdout(dct_data, dct_param):
@@ -102,7 +103,10 @@ def prepare(dct_data, dct_param):
                     if col in df_raw_data.columns]
 
     for yr_col in lst_year_cols:
-        df_raw_data[yr_col] = df_raw_data[yr_col].fillna(df_xvariables.loc[df_xvariables['x']==yr_col,'na_code'].values[0])
+        na_code = df_xvariables.loc[df_xvariables['x'] == yr_col, 'na_code'].values[0]
+        if math.isnan(na_code):
+            na_code = 0
+        df_raw_data[yr_col] = df_raw_data[yr_col].fillna(na_code)
 
 
 
@@ -127,8 +131,6 @@ def prepare(dct_data, dct_param):
 
     df_col_structure.to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)
 
-    dct_data = track_holdout(dct_data, dct_param)
-
     lst_char_cols = [col for col in lst_char_cols if col in df_raw_data]
 
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].fillna(-9223372036854775808)
@@ -136,7 +138,11 @@ def prepare(dct_data, dct_param):
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].replace({'-9223372036854775808': np.nan})
 
-    df_raw_data[[col for col in lst_year_cols if col in df_raw_data.columns]] = df_raw_data[[col for col in lst_year_cols if col in df_raw_data.columns]].astype(int)
+    dct_data = track_holdout(dct_data, dct_param)
+
+
+    lst_year_cols = [col for col in lst_year_cols if col in df_raw_data.columns]
+    df_raw_data[lst_year_cols] = df_raw_data[lst_year_cols].astype(int)
     dct_data['df_raw_data'] = df_raw_data
 
 

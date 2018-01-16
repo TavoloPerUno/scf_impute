@@ -154,11 +154,11 @@ class MasterExploder(object):
 
 class StringFeatureEncoder(object):
     """StringFeatureEncoder takes a dataframe and encodes every categorical ('object') column
-    into an integer column. A spcified string 'missing_marker' gets encoded as -1. inverse_transform
+    into an integer column. A spcified string 'missing_marker' gets encoded as '-9223372036854775808'. inverse_transform
     reverses the transformation.
     """
     def __init__(self, missing_marker='UNKNOWN'):
-        self.missing_replacement = -1
+        self.missing_replacement = -9223372036854775808
         self.missing_marker = missing_marker
         self.encoders = {}
 
