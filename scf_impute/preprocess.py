@@ -23,6 +23,8 @@ def track_holdout(dct_data, dct_param):
 
     dct_removed = {}
 
+    dct_data['df_full_cleaned_data'] = df_raw_data.copy()
+
     for i in test_id:
         # Select a row
         row = df_raw_data.loc[i,]
@@ -42,10 +44,8 @@ def track_holdout(dct_data, dct_param):
 
         dct_removed[i] = columns_dropped
 
-    dct_data['df_full_cleaned_data'] = df_raw_data.copy()
+        df_raw_data.loc[i, dct_removed[i]] = np.nan
 
-    for row_id in list(dct_removed.keys()):
-        df_raw_data.loc[row_id, dct_removed[row_id]] = np.nan
 
     nunique = df_raw_data.apply(pd.Series.nunique)
     empty_cols = list(nunique[nunique == 1].index)
@@ -143,11 +143,5 @@ def prepare(dct_data, dct_param):
     df_raw_data[lst_year_cols] = df_raw_data[lst_year_cols].astype(int)
 
     dct_data = track_holdout(dct_data, dct_param)
-
-
-
-
-
-    dct_data['df_raw_data'] = df_raw_data
 
     return dct_data

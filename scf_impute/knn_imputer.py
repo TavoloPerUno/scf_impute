@@ -58,7 +58,7 @@ class Knn_Imputer:
         - Returns:
                 X(pandas.dataframe): imputed dataframe
         """
-        missing_idxes = np.where(np.isnan(X[:, column]))[0]
+        missing_idxes = np.where(pd.isnull(X[:, column]))[0]
         X_test = X[missing_idxes, :]
         X_test = np.delete(X_test, column, 1)
         # if other columns still have missing values fill with mean
@@ -69,7 +69,7 @@ class Knn_Imputer:
         #     col_mean = np.nanmedian(X, 0)
         # fill missing values in each column with current col_mean
         for col_id in range(0, len(col_mean) - 1):
-            col_missing_idxes = np.where(np.isnan(X_test[:, col_id]))[0]
+            col_missing_idxes = np.where(pd.isnull(X_test[:, col_id]))[0]
             # if no missing values for current column
             if len(col_missing_idxes) == 0:
                 continue
