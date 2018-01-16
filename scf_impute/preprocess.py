@@ -48,10 +48,8 @@ def track_holdout(dct_data, dct_param):
 
         df_raw_data.loc[i, dct_removed[i]] = np.nan
 
-        print(df_raw_data['x1011'].unique())
-
         for col in dct_removed[i]:
-            dct_removed_reverse[col] = dct_removed_reverse.setdefault(col, '') + str(i)
+            dct_removed_reverse[col] = ','.join(filter(None, (dct_removed_reverse.setdefault(col, ''), str(i))))
 
 
     nunique = df_raw_data.apply(pd.Series.nunique)
