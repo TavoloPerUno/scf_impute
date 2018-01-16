@@ -44,11 +44,13 @@ def xgboost_impute(dct_data, dct_param):
 
     random.shuffle(lst_cols_to_impute)
 
-    imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, cols_to_impute=lst_cols_to_impute)  # treat 'UNKNOWN' as missing value
-    filled_in = imputer.fit(df_raw_data).transform(df_raw_data)
+    for col in lst_cols_to_impute:
 
-    filled_in = descale(filled_in, dct_data['df_col_mu_std'], dct_data['lst_num_cols'])
-    return filled_in
+        imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, cols_to_impute=[col])  # treat 'UNKNOWN' as missing value
+        df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
+
+    df_raw_data = descale(df_raw_data, dct_data['df_col_mu_std'], dct_data['lst_num_cols'])
+    return df_raw_data
 
 def glrm_impute(dct_data, dct_param):
 
