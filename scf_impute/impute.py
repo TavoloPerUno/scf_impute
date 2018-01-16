@@ -96,8 +96,8 @@ def knn_impute(dct_data, dct_param, k):
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
     impute = Knn_Imputer()
 
-    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns]
-    lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns]
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
+    lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
 
     dct_col_mean_mode = get_col_mean_mode(df_raw_data, lst_num_cols, lst_char_cols)
 
