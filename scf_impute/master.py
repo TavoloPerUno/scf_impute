@@ -38,9 +38,12 @@ def main(argv):
 
     dct_data = dict()
     dct_param['nrun'] = nrun
-    if os.path.isfile(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle')):
-        with open(os.path.join(dct_param['data'], 'results.pickle'), 'rb') as handle:
+    if os.path.isfile(os.path.join(dct_param['data'], 'variables.pickle')):
+        with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
+
+    # with open(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle'), 'wb') as handle:
+    #     pickle.dump(dct_data, handle, protocol=2)
 
     # temp = dict()
     # if os.path.isfile(os.path.join(dct_param['data'], 'xgboost_impute.pickle')):
@@ -64,13 +67,15 @@ def main(argv):
         dct_data.update(download_data())
 
         dct_data.update(preprocess.prepare(dct_data, dct_param))
-    # with open(os.path.join(dct_param['data'], 'xgboost_knn.pickle'), 'wb') as handle:
-    #     pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # df_knn_data = analysis_variables.fill_analysis_variables(dct_data, dct_param, dct_data['knn_imputed'])
-    # df_xgboost_data = analysis_variables.fill_analysis_variables(dct_data, dct_param, dct_data['xgboost_imputed'])
-    # df_knn_data.to_csv(os.path.join(dct_param['data'], 'knn_imputed_analysis.csv'), index=False)
-    # df_xgboost_data.to_csv(os.path.join(dct_param['data'], 'xgboost_imputed_analysis.csv'), index=False)
+        dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
+        dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=False)
+        dct_data['df_raw_data'].to_csv(os.path.join(dct_param['data'], 'withheld_cleaned.csv'), index=False)
+        dct_data['df_col_structure'].to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)
+
+        with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
+            pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
     df_imputed = ''
     if method == 'xgboost':
@@ -87,13 +92,11 @@ def main(argv):
         df_imputed = impute.glrm_impute(dct_data, dct_param)
 
     df_imputed = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
-    dct_data[method + '_imputed'] = df_imputed
+    dct_data[method + '_imputed_' + str(nrun)] = df_imputed
     df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=False)
 
-    dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
-    dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=False)
-    dct_data['df_raw_data'].to_csv(os.path.join(dct_param['data'], 'withheld_cleaned.csv'), index=False)
-    with open(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle'), 'wb') as handle:
+
+    with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 

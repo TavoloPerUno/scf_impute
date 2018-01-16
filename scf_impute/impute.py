@@ -9,30 +9,36 @@ from glrm.loss import QuadraticLoss, HingeLoss
 from glrm.reg import QuadraticReg
 from glrm.convergence import Convergence
 from sklearn.preprocessing import MaxAbsScaler
-from predictive_imputer import predictive_imputer
+#from predictive_imputer import predictive_imputer
 from scf_impute.knn_imputer import Knn_Imputer
 from scipy import stats
 
 #from fancyimpute import BiScaler, KNN, NuclearNormMinimization, SoftImpute
 
-def rforest_impute(dct_data, dct_param):
-    df_raw_data = dct_data['df_raw_data']
-    imputer = predictive_imputer.PredictiveImputer(f_model='RandomForest')
-    filled_in = imputer.fit(df_raw_data).transform(df_raw_data.copy())
-    df_filled_in = pd.DataFrame(data=filled_in, columns=df_raw_data.columns, index=df_raw_data.index)
-    return df_filled_in
+# def rforest_impute(dct_data, dct_param):
+#     df_raw_data = dct_data['df_raw_data']
+#     imputer = predictive_imputer.PredictiveImputer(f_model='RandomForest')
+#     filled_in = imputer.fit(df_raw_data).transform(df_raw_data.copy())
+#     df_filled_in = pd.DataFrame(data=filled_in, columns=df_raw_data.columns, index=df_raw_data.index)
+#     return df_filled_in
 
 def xgboost_impute(dct_data, dct_param):
     df_raw_data = dct_data['df_raw_data']
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
-    for char_col in dct_data['lst_char_cols']:
-        if char_col in df_raw_data.columns:
-            df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
+
 
     lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns]
     lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns]
 
     lst_cols_to_impute = lst_char_cols + lst_num_cols
+
+    for col in lst_cols_to_impute:
+        if not df_raw_data[col].isnull().any():
+            lst_cols_to_impute.remove(col)
+
+    for char_col in lst_char_cols:
+        if char_col in df_raw_data.columns:
+            df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
 
     random.seed(dct_param['nrun'] * 100)
 
@@ -47,13 +53,14 @@ def xgboost_impute(dct_data, dct_param):
 def glrm_impute(dct_data, dct_param):
 
     df_raw_data = dct_data['df_raw_data']
+    # df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
     k = df_raw_data.shape[0]
     lst_char_cols = dct_data['lst_char_cols']
     lst_year_cols = dct_data['lst_year_cols']
     np_char = df_raw_data[[col for col in lst_char_cols if col in df_raw_data.columns]].values
-    np_num = df_raw_data[[col for col in df_raw_data.columns if col not in lst_char_cols]].values
+    np_num = df_raw_data[[col for col in df_raw_data.columns if col in  dct_data['lst_year_cols'] +  dct_data['lst_num_cols']]].values
     lst_missing_num = np.argwhere(np.isnan(np_num)).tolist()
-    lst_missing_char = np.argwhere(np_char == 'nan').tolist()
+    lst_missing_char = np.argwhere(pd.isnull(np_char)).tolist()
 
 
 

@@ -1,4 +1,4 @@
-from glrm.convergence import Convergence
+from .convergence import Convergence
 from numpy import sqrt, repeat, tile, hstack, array, zeros, ones, sqrt, diag, asarray, hstack, vstack, split, cumsum
 from numpy.random import randn
 from copy import copy
@@ -110,11 +110,11 @@ class GLRM(object):
             
             # collect non-missing terms
             for j in range(ni):
-                elems = array([ai[i,j] for i in range(m) if (i,j) not in missing])
+                elems = ai[[i for i in range(m) if [i,j] not in missing], j]
                 alpha = cp.Variable()
                 # calculate standarized energy per column
                 sv[j] = cp.Problem(cp.Minimize(\
-                        L(elems, alpha*ones(elems.shape)))).solve()/len(elems)
+                        L(elems, alpha*ones(elems.shape)))).solve(solver=cp.SCS)/len(elems)
                 mu[j] = alpha.value
 
             offset, mask = tile(mu, (m,1)), tile(sv, (m,1))
