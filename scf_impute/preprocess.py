@@ -25,6 +25,8 @@ def track_holdout(dct_data, dct_param):
 
     dct_data['df_full_cleaned_data'] = df_raw_data.copy()
 
+    dct_removed_reverse = {}
+
     for i in test_id:
         # Select a row
         row = df_raw_data.loc[i,]
@@ -46,6 +48,11 @@ def track_holdout(dct_data, dct_param):
 
         df_raw_data.loc[i, dct_removed[i]] = np.nan
 
+        print(df_raw_data['x1011'].unique())
+
+        for col in dct_removed[i]:
+            dct_removed_reverse[col] = dct_removed_reverse.setdefault(col, '') + str(i)
+
 
     nunique = df_raw_data.apply(pd.Series.nunique)
     empty_cols = list(nunique[nunique == 1].index)
@@ -53,8 +60,8 @@ def track_holdout(dct_data, dct_param):
     empty_cols.extend(df_raw_data.columns[df_raw_data.isnull().all()].tolist())
     df_raw_data = df_raw_data.dropna(axis=1, how='all')
 
-    for k in dct_removed:
-        dct_removed[k] = [col for col in dct_removed[k] if col not in empty_cols]
+    # for k in dct_removed:
+    #     dct_removed[k] = [col for col in dct_removed[k] if col not in empty_cols]
 
     df_raw_data[empty_cols] = dct_data['df_full_cleaned_data'][empty_cols]
 
@@ -66,12 +73,12 @@ def track_holdout(dct_data, dct_param):
 
 
 
-    dct_removed = util.reverse_map(dct_removed)
+    # dct_removed = util.reverse_map(dct_removed)
 
-    for k in dct_removed.keys():
-        dct_removed[k] = ",".join(map(str, dct_removed[k]))
+    # for k in dct_removed.keys():
+    #     dct_removed[k] = ",".join(map(str, dct_removed[k]))
 
-    dct_data['df_removed'] = pd.DataFrame(dct_removed, index=[0])
+    dct_data['df_removed'] = pd.DataFrame(dct_removed_reverse, index=[0])
 
     dct_data['holdout_idx'] = holdout_idx
 

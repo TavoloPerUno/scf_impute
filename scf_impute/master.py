@@ -77,7 +77,7 @@ def main(argv):
     #     temp  = pickle.load(handle)
     # dct_data['knn_imputed'] = temp['knn_imputed']
 
-    if len(list(dct_data.keys())) < 1:
+    if True:#len(list(dct_data.keys())) < 1:
         dct_data.update(download_data())
 
         dct_data.update(preprocess.prepare(dct_data, dct_param))
@@ -117,7 +117,10 @@ def main(argv):
         with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
             dct_data_new = pickle.load(handle)
 
-    dct_data_new.pop(method + '_imputed_' + str(nrun), None)
+    for key in dct_data_new:
+        if key in dct_data:
+
+            dct_data_new.pop(key, None)
 
     dct_data.update(dct_data_new)
 

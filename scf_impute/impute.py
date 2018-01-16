@@ -103,6 +103,10 @@ def knn_impute(dct_data, dct_param, k):
 
     lst_cols_to_impute = lst_char_cols + lst_num_cols
 
+    for col in lst_cols_to_impute:
+        if not df_raw_data[col].isnull().any():
+            lst_cols_to_impute.remove(col)
+
     random.seed(dct_param['nrun'] * 100)
 
     random.shuffle(lst_cols_to_impute)
