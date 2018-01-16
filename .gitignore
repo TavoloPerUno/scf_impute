@@ -1,3 +1,4 @@
 data/
+glrm/__pycache__/
 .idea/
 scf_impute/__pycache__/
