@@ -82,6 +82,7 @@ def knn_impute(dct_data, dct_param, k):
         is_categorical = True
         if col in lst_num_cols:
             is_categorical = False
+        print("Fitting column %s, (%s of %s)" % (col, len(lst_cols_to_impute) + 1, len(lst_cols_to_impute)))
         np_imputed = impute.knn(X=df_raw_data, column=col, k=k, is_categorical=is_categorical, np_mean_mode=np_mean_mode)
         df_raw_data[col] = pd.DataFrame(data=np_imputed, columns=df_raw_data.columns, index=df_raw_data.index)[col]
 
