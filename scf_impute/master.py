@@ -19,6 +19,17 @@ parser.add_argument('--iter', type=int,
 dct_param = {'data': os.path.join('..', 'data'),
              'missing_val': 'nan'}
 
+def prepare_for_upload(dct_data, df_imputed):
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col not in dct_data['lst_skipped_cols']]
+    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col not in dct_data['lst_skipped_cols']]
+
+    df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(int)
+    df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(str)
+
+    df_imputed[lst_year_cols] = df_imputed[lst_year_cols].astype(int)
+
+    return df_imputed
+
 def download_data():
 
     dct_data = dict()
@@ -42,8 +53,8 @@ def main(argv):
         with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
 
-    dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
-    dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=True)
+    # dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
+    # dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=True)
 
     # with open(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle'), 'wb') as handle:
     #     pickle.dump(dct_data, handle, protocol=2)
@@ -94,10 +105,21 @@ def main(argv):
     if method == 'glrm':
         df_imputed = impute.glrm_impute(dct_data, dct_param)
 
-    df_imputed = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
+
+    df_imputed = prepare_for_upload(dct_data, analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed))
     dct_data[method + '_imputed_' + str(nrun)] = df_imputed
+
     df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=True)
 
+    dct_data_new = dict()
+
+    if os.path.isfile(os.path.join(dct_param['data'], 'variables.pickle')):
+        with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
+            dct_data_new = pickle.load(handle)
+
+    dct_data_new.pop(method + '_imputed_' + str(nrun), None)
+
+    dct_data.update(dct_data_new)
 
     with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)

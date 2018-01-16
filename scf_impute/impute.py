@@ -27,18 +27,16 @@ def xgboost_impute(dct_data, dct_param):
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
 
 
-    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns]
-    lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns]
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
+    lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
+
+    df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
     lst_cols_to_impute = lst_char_cols + lst_num_cols
 
     for col in lst_cols_to_impute:
         if not df_raw_data[col].isnull().any():
             lst_cols_to_impute.remove(col)
-
-    for char_col in lst_char_cols:
-        if char_col in df_raw_data.columns:
-            df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
 
     random.seed(dct_param['nrun'] * 100)
 
@@ -47,7 +45,15 @@ def xgboost_impute(dct_data, dct_param):
     unique_count = df_raw_data[lst_cols_to_impute].nunique().values
     idx_split = [val[0] for val in np.argwhere(unique_count <= 2).tolist()]
 
-    lst_parts = [[lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]]
+    for char_col in lst_char_cols:
+        if char_col in df_raw_data.columns:
+            df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
+
+
+
+
+
+    lst_parts = [lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
 
     for cols in lst_parts:
 
