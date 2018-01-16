@@ -80,9 +80,9 @@ class MLImputer(object):
 
             feats = self.col2feats[col]
             if np.issubdtype(column.dtype, np.floating):
-                model = self.base_regressor()
+                model = self.base_regressor
             else:
-                model = self.base_classifier()
+                model = self.base_classifier
 
             X = df.get(feats)[~missing_mask(column)].reset_index(drop=True)
             y = column[~missing_mask(column)].values

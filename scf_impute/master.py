@@ -37,7 +37,7 @@ def main(argv):
     nrun = args.nrun
 
     dct_data = dict()
-
+    dct_param['nrun'] = nrun
     if os.path.isfile(os.path.join(dct_param['data'], 'results.pickle')):
         with open(os.path.join(dct_param['data'], 'results.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
@@ -90,6 +90,7 @@ def main(argv):
     df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=False)
 
     dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
+    dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=False)
     with open(os.path.join(dct_param['data'], 'results.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 

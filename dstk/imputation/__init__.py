@@ -3,14 +3,15 @@ import numpy as np
 import pandas as pd
 from dstk.imputation.ml_imputation import MLImputer
 from dstk.imputation.encoders import MasterExploder, StringFeatureEncoder
-from dstk.imputation.bayes_imputation import BayesNetImputer
 from dstk.imputation.utils import mask_missing
 
 
-def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None):
+def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None, random_state=10):
+    xgbClassifier = XGBClassifier(seed = random_state)
+    xgbRegressor = XGBRegressor(seed=random_state)
     return MLImputer(
-        base_classifier=XGBClassifier,
-        base_regressor=XGBRegressor,
+        base_classifier=xgbClassifier,
+        base_regressor=xgbRegressor,
         feature_encoder=StringFeatureEncoder(missing_marker=missing_string_marker),
         missing_features=missing_features)
 

@@ -41,9 +41,10 @@ def track_holdout(dct_data, dct_param):
 
         dct_removed[i] = columns_dropped
 
-    dct_data['df_full_cleaned_data'] = df_raw_data
+    dct_data['df_full_cleaned_data'] = df_raw_data.copy()
+
     for row_id in list(dct_removed.keys()):
-        df_raw_data.ix[row_id, dct_removed[row_id]] = np.nan
+        df_raw_data.loc[row_id, dct_removed[row_id]] = np.nan
 
     nunique = df_raw_data.apply(pd.Series.nunique)
     empty_cols = list(nunique[nunique == 1].index)
@@ -58,9 +59,11 @@ def track_holdout(dct_data, dct_param):
 
     holdout_idx = util.key_val_products(dct_removed)
 
-    df_raw_data.to_csv('test.csv')
+
 
     dct_data['df_raw_data'] = df_raw_data
+
+
 
     dct_removed = util.reverse_map(dct_removed)
 
@@ -68,6 +71,7 @@ def track_holdout(dct_data, dct_param):
         dct_removed[k] = ",".join(map(str, dct_removed[k]))
 
     dct_data['df_removed'] = pd.DataFrame(dct_removed, index=[0])
+
     dct_data['holdout_idx'] = holdout_idx
 
 
@@ -130,5 +134,6 @@ def prepare(dct_data, dct_param):
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
 
     dct_data['df_raw_data'] = df_raw_data
+
 
     return dct_data
