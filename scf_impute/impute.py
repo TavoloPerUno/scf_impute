@@ -48,6 +48,7 @@ def xgboost_impute(dct_data, dct_param):
 
         imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, cols_to_impute=[col])  # treat 'UNKNOWN' as missing value
         df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
+        print("(%s of %s)" % (lst_cols_to_impute.index(col), len(lst_cols_to_impute)))
 
     df_raw_data = descale(df_raw_data, dct_data['df_col_mu_std'], dct_data['lst_num_cols'])
     return df_raw_data
