@@ -27,7 +27,7 @@ class MLImputer(object):
                  base_imputer=IdentityEncoder,
                  feature_encoder=IdentityEncoder(),
                  missing_features=None,
-                 cols_to_impute=cols_to_impute):
+                 cols_to_impute=[]):
         """
         :param base_classifier: the sklearn-like classifier used to impute categorical columns
         :param base_regressor: the sklearn-like regressor used to impute continous columns
