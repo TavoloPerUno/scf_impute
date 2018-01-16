@@ -38,7 +38,7 @@ def main(argv):
 
     dct_data = dict()
     dct_param['nrun'] = nrun
-    if os.path.isfile(os.path.join(dct_param['data'], 'results.pickle')):
+    if os.path.isfile(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle')):
         with open(os.path.join(dct_param['data'], 'results.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
 
@@ -60,9 +60,10 @@ def main(argv):
     #     temp  = pickle.load(handle)
     # dct_data['knn_imputed'] = temp['knn_imputed']
 
-    dct_data.update(download_data())
+    if len(list(dct_data.keys())) < 1:
+        dct_data.update(download_data())
 
-    dct_data.update(preprocess.prepare(dct_data, dct_param))
+        dct_data.update(preprocess.prepare(dct_data, dct_param))
     # with open(os.path.join(dct_param['data'], 'xgboost_knn.pickle'), 'wb') as handle:
     #     pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -91,7 +92,8 @@ def main(argv):
 
     dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
     dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=False)
-    with open(os.path.join(dct_param['data'], 'results.pickle'), 'wb') as handle:
+    dct_data['df_raw_data'].to_csv(os.path.join(dct_param['data'], 'withheld_cleaned.csv'), index=False)
+    with open(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 

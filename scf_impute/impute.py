@@ -102,7 +102,7 @@ def knn_impute(dct_data, dct_param, k):
     #     np_imputed = impute.knn(X=df_raw_data, column=col, k=k, np_mean_mode=np_mean_mode)
     #     df_raw_data[col] = pd.DataFrame(data=np_imputed, columns=df_raw_data.columns, index=df_raw_data.index)[col]
 
-    df_raw_data = descale(df_raw_data, dct_data['df_col_mu_std'], dct_data['lst_num_cols'])
+    df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])
     # filled_in = KNN(k=k).complete(df_raw_data)
     #
     # df_filled_in = pd.DataFrame(data=filled_in, columns=df_raw_data.columns, index=df_raw_data.index)
@@ -112,8 +112,8 @@ def knn_impute(dct_data, dct_param, k):
 def descale(df_raw_data, df_col_mu_std, lst_num_cols):
     for col in lst_num_cols:
         if col in df_raw_data.columns:
-            mu = df_col_mu_std[col, 'mean']
-            std = df_col_mu_std[col, 'std']
+            mu = df_col_mu_std.loc[col, 'mean']
+            std = df_col_mu_std.loc[col, 'std']
             df_raw_data[col] = df_raw_data[col]*std + mu
 
     return df_raw_data

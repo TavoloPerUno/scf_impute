@@ -30,7 +30,7 @@ df_raw[colnames(df_char_cols)] <- df_char_cols
 df_raw[colnames(df_num_cols)] <- df_num_cols
 
 
-registerDoParallel(cores = 70)
+registerDoParallel(cores = 50)
 imputed <- NA
 imputed <- missForest(xmis = df_raw,
                       ntree = 100,
