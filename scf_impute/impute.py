@@ -44,11 +44,16 @@ def xgboost_impute(dct_data, dct_param):
 
     random.shuffle(lst_cols_to_impute)
 
-    for col in lst_cols_to_impute:
+    unique_count = df_raw_data[lst_cols_to_impute].nunique().values
+    idx_split = [val[0] for val in np.argwhere(unique_count <= 2).tolist()]
 
-        imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, cols_to_impute=[col])  # treat 'UNKNOWN' as missing value
+    lst_parts = [[lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]]
+
+    for cols in lst_parts:
+
+        imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, cols_to_impute=cols)  # treat 'UNKNOWN' as missing value
         df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
-        print("(%s of %s)" % (lst_cols_to_impute.index(col), len(lst_cols_to_impute)))
+        print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[len(cols) - 1])), (len(lst_cols_to_impute))))
 
     df_raw_data = descale(df_raw_data, dct_data['df_col_mu_std'], dct_data['lst_num_cols'])
     return df_raw_data

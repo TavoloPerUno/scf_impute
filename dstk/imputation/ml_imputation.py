@@ -77,8 +77,8 @@ class MLImputer(object):
             else:
                 self.col2type[col] = 'integer'
 
-            logger.info("fitting MLImputer on %s column %s. %s column out of %s"
-                        % (self.col2type[col], col, i + 1, len(self.column_set)))
+            logger.info("fitting MLImputer on %s column %s."
+                        % (self.col2type[col], col))
 
             feats = self.col2feats[col]
             if np.issubdtype(column.dtype, np.floating):

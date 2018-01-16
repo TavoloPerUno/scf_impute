@@ -42,6 +42,9 @@ def main(argv):
         with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
 
+    dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
+    dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=True)
+
     # with open(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.pickle'), 'wb') as handle:
     #     pickle.dump(dct_data, handle, protocol=2)
 
@@ -69,8 +72,8 @@ def main(argv):
         dct_data.update(preprocess.prepare(dct_data, dct_param))
 
         dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
-        dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=False)
-        dct_data['df_raw_data'].to_csv(os.path.join(dct_param['data'], 'withheld_cleaned.csv'), index=False)
+        dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=True)
+        dct_data['df_raw_data'].to_csv(os.path.join(dct_param['data'], 'withheld_cleaned.csv'), index=True)
         dct_data['df_col_structure'].to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)
 
         with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
@@ -93,7 +96,7 @@ def main(argv):
 
     df_imputed = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
     dct_data[method + '_imputed_' + str(nrun)] = df_imputed
-    df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=False)
+    df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=True)
 
 
     with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
