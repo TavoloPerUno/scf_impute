@@ -26,8 +26,7 @@ class MLImputer(object):
                  base_regressor=None,
                  base_imputer=IdentityEncoder,
                  feature_encoder=IdentityEncoder(),
-                 missing_features=None,
-                 cols_to_impute=[]):
+                 missing_features=None):
         """
         :param base_classifier: the sklearn-like classifier used to impute categorical columns
         :param base_regressor: the sklearn-like regressor used to impute continous columns
@@ -52,7 +51,6 @@ class MLImputer(object):
         self.col2feats = {}
         self.col2type = {}
         self.missing_features = missing_features
-        self.cols_to_impute = cols_to_impute
 
     def __str__(self):
         return "MLImputer(%s, %s, %s, %s)" % (
@@ -62,7 +60,7 @@ class MLImputer(object):
         df = self.feature_encoder.fit(df).transform(df)
         self.column_set = set(df.columns)
         if self.missing_features is None:
-            self.missing_features = self.cols_to_impute
+            self.missing_features = self.column_set
 
         for col in self.missing_features:
             other_cols = sorted(self.column_set.difference({col}))
@@ -87,14 +85,14 @@ class MLImputer(object):
                 model = self.base_classifier
 
             X = df.get(feats)[~missing_mask(column)].reset_index(drop=True)
-            y = column[~missing_mask(column)].values
+            y = column[~missing_mask(column)]
             if len(y) == 0:
                 raise ValueError(
                     'need at least 1 nonmissing value to train imputer')
 
             imputer = Pipeline(
                 [('encoder', self.base_imputer()), ('imputer', model)])
-            self.col2imputer[col] = imputer.fit(X, y)
+            self.col2imputer[col] = imputer.fit(X.as_matrix(), y.as_matrix())
             logger.info('column imputer fitted on %s column' % col)
         return self
 
@@ -105,19 +103,21 @@ class MLImputer(object):
             column = df[col]
             column_copy = np.copy(column)
             if col in self.missing_features:
+
                 feats = self.col2feats[col]
+
                 missing = missing_mask(column)
                 if missing.any():
                     if proba and self.col2type[col] == 'boolean':
                         predictions = (
                             self.col2imputer[col]
-                            .predict_proba(df.get(feats)[missing].reset_index(drop=True))[:, 1]
+                            .predict_proba(df.get(feats)[missing].reset_index(drop=True).as_matrix())[:, 1]
                         )
                         column_copy += 0.0
                     else:
                         predictions = (
                             self.col2imputer[col]
-                            .predict(df.get(feats)[missing].reset_index(drop=True))
+                            .predict(df.get(feats)[missing].reset_index(drop=True).as_matrix())
                         )
 
                     column_copy[np.where(missing_mask(column))] = predictions
