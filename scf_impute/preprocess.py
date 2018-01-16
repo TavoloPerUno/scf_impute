@@ -131,8 +131,12 @@ def prepare(dct_data, dct_param):
 
     lst_char_cols = [col for col in lst_char_cols if col in df_raw_data]
 
+    df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].fillna(-9223372036854775808)
+    df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(int)
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
+    df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].replace({'-9223372036854775808': np.nan})
 
+    df_raw_data[[col for col in lst_year_cols if col in df_raw_data.columns]] = df_raw_data[[col for col in lst_year_cols if col in df_raw_data.columns]].astype(int)
     dct_data['df_raw_data'] = df_raw_data
 
 

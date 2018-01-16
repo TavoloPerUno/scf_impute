@@ -29,7 +29,16 @@ def xgboost_impute(dct_data, dct_param):
         if char_col in df_raw_data.columns:
             df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
 
-    imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100)  # treat 'UNKNOWN' as missing value
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns]
+    lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns]
+
+    lst_cols_to_impute = lst_char_cols + lst_num_cols
+
+    random.seed(dct_param['nrun'] * 100)
+
+    random.shuffle(lst_cols_to_impute)
+
+    imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, cols_to_impute=lst_cols_to_impute)  # treat 'UNKNOWN' as missing value
     filled_in = imputer.fit(df_raw_data).transform(df_raw_data)
 
     filled_in = descale(filled_in, dct_data['df_col_mu_std'], dct_data['lst_num_cols'])
@@ -124,7 +133,7 @@ def scale(df_raw_data, lst_num_cols):
 
 def get_col_mean_mode(df_raw_data, lst_num_cols, lst_char_cols):
     dct_mean_mode = dict(zip(lst_num_cols, list(np.nanmean(df_raw_data[lst_num_cols].as_matrix(), 0))))
-    dct_mean_mode.update(dict(zip(lst_char_cols, list(stats.mode(df_raw_data[lst_char_cols].as_matrix(), 0, nan_policy='omit')[0][0]))))
+    dct_mean_mode.update(dict(zip(lst_char_cols, list(df_raw_data[lst_char_cols].mode(0).iloc[0]))))
 
     return dct_mean_mode
 

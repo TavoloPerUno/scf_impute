@@ -26,7 +26,8 @@ class MLImputer(object):
                  base_regressor=None,
                  base_imputer=IdentityEncoder,
                  feature_encoder=IdentityEncoder(),
-                 missing_features=None):
+                 missing_features=None,
+                 cols_to_impute=cols_to_impute):
         """
         :param base_classifier: the sklearn-like classifier used to impute categorical columns
         :param base_regressor: the sklearn-like regressor used to impute continous columns
@@ -51,6 +52,7 @@ class MLImputer(object):
         self.col2feats = {}
         self.col2type = {}
         self.missing_features = missing_features
+        self.cols_to_impute = cols_to_impute
 
     def __str__(self):
         return "MLImputer(%s, %s, %s, %s)" % (
@@ -60,7 +62,7 @@ class MLImputer(object):
         df = self.feature_encoder.fit(df).transform(df)
         self.column_set = set(df.columns)
         if self.missing_features is None:
-            self.missing_features = self.column_set
+            self.missing_features = self.cols_to_impute
 
         for col in self.missing_features:
             other_cols = sorted(self.column_set.difference({col}))

@@ -6,14 +6,15 @@ from dstk.imputation.encoders import MasterExploder, StringFeatureEncoder
 from dstk.imputation.utils import mask_missing
 
 
-def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None, random_state=10):
+def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None, random_state=10, cols_to_impute = []):
     xgbClassifier = XGBClassifier(seed = random_state)
     xgbRegressor = XGBRegressor(seed=random_state)
     return MLImputer(
         base_classifier=xgbClassifier,
         base_regressor=xgbRegressor,
         feature_encoder=StringFeatureEncoder(missing_marker=missing_string_marker),
-        missing_features=missing_features)
+        missing_features=missing_features,
+        cols_to_impute=cols_to_impute)
 
 
 def sample_dataset():
