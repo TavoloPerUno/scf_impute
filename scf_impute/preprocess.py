@@ -102,11 +102,7 @@ def prepare(dct_data, dct_param):
     lst_num_cols = [col for col in list(df_xvariables[df_xvariables.nominal_character_c_or_numeric_n.isin(['N', 'P', 'I'])].x)
                     if col in df_raw_data.columns]
 
-    for yr_col in lst_year_cols:
-        na_code = df_xvariables.loc[df_xvariables['x'] == yr_col, 'na_code'].values[0]
-        if math.isnan(na_code):
-            na_code = 0
-        df_raw_data[yr_col] = df_raw_data[yr_col].fillna(na_code)
+
 
 
 
@@ -138,12 +134,20 @@ def prepare(dct_data, dct_param):
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
     df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].replace({'-9223372036854775808': np.nan})
 
+    lst_year_cols = [col for col in lst_year_cols if col in df_raw_data.columns]
+
+    for yr_col in lst_year_cols:
+        na_code = df_xvariables.loc[df_xvariables['x'] == yr_col, 'na_code'].values[0]
+        df_raw_data[yr_col] = df_raw_data[yr_col].fillna(na_code)
+
+    df_raw_data[lst_year_cols] = df_raw_data[lst_year_cols].astype(int)
+
     dct_data = track_holdout(dct_data, dct_param)
 
 
-    lst_year_cols = [col for col in lst_year_cols if col in df_raw_data.columns]
-    df_raw_data[lst_year_cols] = df_raw_data[lst_year_cols].astype(int)
-    dct_data['df_raw_data'] = df_raw_data
 
+
+
+    dct_data['df_raw_data'] = df_raw_data
 
     return dct_data
