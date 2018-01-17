@@ -17,6 +17,27 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import Imputer, LabelEncoder
 
+class CustomLabelEncoder(LabelEncoder):
+    def inverse_transform(self, y):
+        """Transform labels back to original encoding.
+
+        Parameters
+        ----------
+        y : numpy array of shape [n_samples]
+            Target values.
+
+        Returns
+        -------
+        y : numpy array of shape [n_samples]
+        """
+        LabelEncoder.check_is_fitted(self, 'classes_')
+
+        diff = np.setdiff1d(y, np.arange(len(self.classes_)))
+        if len(diff):
+            raise ValueError("y contains new labels: %s" % str(diff))
+        y = np.asarray(y)
+        return self.classes_[y]
+
 
 class MissingNumericEncoder(object):
     """transformer that takes a numeric dataframe column (with missing values)
@@ -79,7 +100,7 @@ class MissingCategoricalEncoder(object):
 
     def __init__(self, column_name):
         self.column_name = column_name
-        self.label_encoder = LabelEncoder()
+        self.label_encoder = CustomLabelEncoder()
 
     def fit(self, df, y=None):
         vals = list(df.get(self.column_name)) + [None]
@@ -172,7 +193,7 @@ class StringFeatureEncoder(object):
             col = X[c]
             if col.dtype != 'object':
                 continue
-            self.encoders[c] = LabelEncoder().fit(
+            self.encoders[c] = CustomLabelEncoder().fit(
                 list(col) + [self.missing_marker])
         return self
 
