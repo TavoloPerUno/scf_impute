@@ -16,7 +16,7 @@ dstk.imputation.test_encoders
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import Imputer, LabelEncoder
-
+from sklearn.utils.validation import check_is_fitted
 class CustomLabelEncoder(LabelEncoder):
     def inverse_transform(self, y):
         """Transform labels back to original encoding.
@@ -30,7 +30,7 @@ class CustomLabelEncoder(LabelEncoder):
         -------
         y : numpy array of shape [n_samples]
         """
-        LabelEncoder.check_is_fitted(self, 'classes_')
+        check_is_fitted(self, 'classes_')
 
         diff = np.setdiff1d(y, np.arange(len(self.classes_)))
         if len(diff):

@@ -77,7 +77,7 @@ def main(argv):
     #     temp  = pickle.load(handle)
     # dct_data['knn_imputed'] = temp['knn_imputed']
 
-    if True:#len(list(dct_data.keys())) < 1:
+    if len(list(dct_data.keys())) < 1:
         dct_data.update(download_data())
 
         dct_data.update(preprocess.prepare(dct_data, dct_param))
