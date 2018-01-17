@@ -33,10 +33,20 @@ class CustomLabelEncoder(LabelEncoder):
         check_is_fitted(self, 'classes_')
 
         diff = np.setdiff1d(y, np.arange(len(self.classes_)))
+
+        labls = np.asarray(y)
         if len(diff):
-            raise ValueError("y contains new labels: %s" % str(diff))
-        y = np.asarray(y)
-        return self.classes_[y]
+            print("y contains new labels: %s" % str(diff))
+            print('Classes: ')
+            print(self.classes_)
+            predicted_classes = np.unique(labls)
+            for new_class in diff:
+                index = np.argwhere(predicted_classes == new_class)
+                predicted_classes = np.delete(predicted_classes, index)
+            predicted_classes.sort()
+            labls = np.clip(y, min(predicted_classes),max(predicted_classes))
+
+        return self.classes_[labls]
 
 
 class MissingNumericEncoder(object):

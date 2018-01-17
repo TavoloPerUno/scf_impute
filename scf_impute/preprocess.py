@@ -34,15 +34,22 @@ def track_holdout(dct_data, dct_param):
         # Find columns with data
         existing_columns = row.index[row.notnull()]
 
-        existing_columns = pd.Index([col for col in existing_columns if col in dct_data['lst_char_cols'] + dct_data['lst_num_cols']])
+        existing_columns = list([col for col in existing_columns if col in dct_data['lst_char_cols'] + dct_data['lst_num_cols']])
+
+        dct_unique_others = df_raw_data.loc[df_raw_data.index != i, existing_columns].nunique(dropna=False)
+        dct_unique = df_raw_data.loc[:, existing_columns].nunique(dropna=False)
+
+        existing_columns = [col for col in existing_columns if dct_unique_others[col] == dct_unique[col]]
+
 
         # Miniumum of length of existing columns or 10
-        num_valuesdropped = min(len(existing_columns) - 5, 10)
+        num_valuesdropped = max(0, min(len(existing_columns) - 5, 10))
 
         # Create list of indices and then randomly select values that will be dropped for analysis
-        existing_columns_indices = list(range(len(existing_columns)))
+        kept = pd.Index(existing_columns)
+        kept_indices = list(range(len(kept)))
         random.seed(10 + i)
-        columns_dropped = existing_columns[random.sample(existing_columns_indices, num_valuesdropped)]
+        columns_dropped = kept[random.sample(kept_indices, num_valuesdropped)]
 
         dct_removed[i] = columns_dropped
 

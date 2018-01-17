@@ -53,7 +53,7 @@ def xgboost_impute(dct_data, dct_param):
 
 
 
-    lst_parts = [lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
+    lst_parts = [['x11015', 'x4137']] + [lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
 
     for cols in lst_parts:
 
