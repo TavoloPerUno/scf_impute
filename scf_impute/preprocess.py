@@ -27,26 +27,37 @@ def track_holdout(dct_data, dct_param):
 
     dct_removed_reverse = {}
 
+    tot_val = len(test_id)
+
+    finished = 0
+
     for i in test_id:
         # Select a row
         row = df_raw_data.loc[i,]
 
         # Find columns with data
-        existing_columns = row.index[row.notnull()]
+        existing_nums = list(row[dct_data['lst_num_cols']].index[
+                                    row[dct_data['lst_num_cols']].notnull()])
 
-        existing_columns = list([col for col in existing_columns if col in dct_data['lst_char_cols'] + dct_data['lst_num_cols']])
+        existing_chars = list(row[dct_data['lst_char_cols']].index[
+                                    row[dct_data['lst_char_cols']].notnull()])
 
-        dct_unique_others = df_raw_data.loc[df_raw_data.index != i, existing_columns].nunique(dropna=False)
-        dct_unique = df_raw_data.loc[:, existing_columns].nunique(dropna=False)
 
-        existing_columns = [col for col in existing_columns if dct_unique_others[col] == dct_unique[col]]
+
+        dct_unique_others = dict(df_raw_data.loc[df_raw_data.index != i, existing_chars].nunique(dropna=False))
+        dct_unique = dict(df_raw_data.loc[:, existing_chars].nunique(dropna=False))
+
+        existing_chars = [val[0] for val in dct_unique_others.items() & dct_unique.items()]
+
+        existing_columns = existing_nums + existing_chars
 
 
         # Miniumum of length of existing columns or 10
         num_valuesdropped = max(0, min(len(existing_columns) - 5, 10))
-
-        # Create list of indices and then randomly select values that will be dropped for analysis
+        random.seed(10 + i)
+        random.shuffle(existing_columns)
         kept = pd.Index(existing_columns)
+        # Create list of indices and then randomly select values that will be dropped for analysis
         kept_indices = list(range(len(kept)))
         random.seed(10 + i)
         columns_dropped = kept[random.sample(kept_indices, num_valuesdropped)]
@@ -57,6 +68,9 @@ def track_holdout(dct_data, dct_param):
 
         for col in dct_removed[i]:
             dct_removed_reverse[col] = ','.join(filter(None, (dct_removed_reverse.setdefault(col, ''), str(i))))
+
+        finished += 1
+
 
 
     nunique = df_raw_data.apply(pd.Series.nunique)
