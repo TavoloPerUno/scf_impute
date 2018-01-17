@@ -16,6 +16,9 @@ parser.add_argument('method', type=str,
 parser.add_argument('--iter', type=int,
                     help='n_run', default=1, dest='nrun')
 
+parser.add_argument('--redowithholding', type=int,
+                    help='Should withholding be done again?', default=0, dest='withhold')
+
 dct_param = {'data': os.path.join('..', 'data'),
              'missing_val': 'nan'}
 
@@ -46,9 +49,11 @@ def main(argv):
     args = parser.parse_args()
     method = args.method
     nrun = args.nrun
+    withhold = args.withhold
 
     dct_data = dict()
     dct_param['nrun'] = nrun
+    dct_param['withhold'] = withhold
     if os.path.isfile(os.path.join(dct_param['data'], 'variables.pickle')):
         with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
