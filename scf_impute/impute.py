@@ -32,18 +32,18 @@ def xgboost_impute(dct_data, dct_param):
 
     df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
-    lst_cols_to_impute = lst_char_cols + lst_num_cols
-
-    for col in lst_cols_to_impute:
-        if not df_raw_data[col].isnull().any():
-            lst_cols_to_impute.remove(col)
-
-    random.seed(dct_param['nrun'] * 100)
-
-    random.shuffle(lst_cols_to_impute)
-
-    unique_count = df_raw_data[lst_cols_to_impute].nunique().values
-    idx_split = [val[0] for val in np.argwhere(unique_count <= 2).tolist()]
+    # lst_cols_to_impute = lst_char_cols + lst_num_cols
+    #
+    # for col in lst_cols_to_impute:
+    #     if not df_raw_data[col].isnull().any():
+    #         lst_cols_to_impute.remove(col)
+    #
+    # random.seed(dct_param['nrun'] * 100)
+    #
+    # random.shuffle(lst_cols_to_impute)
+    #
+    # unique_count = df_raw_data[lst_cols_to_impute].nunique().values
+    # idx_split = [val[0] for val in np.argwhere(unique_count <= 2).tolist()]
 
     for char_col in lst_char_cols:
         if char_col in df_raw_data.columns:
@@ -53,15 +53,17 @@ def xgboost_impute(dct_data, dct_param):
 
 
 
-    lst_parts =[lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
-    for cols in lst_parts:
+    # lst_parts =[lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
+    # for cols in lst_cols_to_impute:
 
-        imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, missing_features=cols)  # treat 'UNKNOWN' as missing value
-        df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
-        print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
+    imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100)#, missing_features=[cols])  # treat 'UNKNOWN' as missing value
+    df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
+        # if cols in lst_char_cols:
+        #     print(df_raw_data[cols].unique())
+        # print("(%s of %s)" % (str(lst_cols_to_impute.index(cols) + 1), str(len(lst_cols_to_impute))))
 
     df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])
-    return df_raw_data, lst_cols_to_impute
+    return df_raw_data#, lst_cols_to_impute
 
 def glrm_impute(dct_data, dct_param):
 

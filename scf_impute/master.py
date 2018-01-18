@@ -7,6 +7,7 @@ import pickle
 from scf_impute import preprocess
 from scf_impute import impute
 from scf_impute import analysis_variables
+import numpy as np
 
 parser = argparse.ArgumentParser(description='Impute SCF Data')
 
@@ -22,19 +23,23 @@ parser.add_argument('--redowithholding', type=int,
 dct_param = {'data': os.path.join('..', 'data'),
              'missing_val': 'nan'}
 
-def prepare_for_upload(dct_data, df_imputed):
-    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in dct_data['cols_to_impute']]
-    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col in dct_data['cols_to_impute']]
+def prepare_for_upload(dct_data, df_raw_data):
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns]
+    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col in df_raw_data.columns]
 
     try:
-        df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(int)
-        df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(str)
+        df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].fillna(-9223372036854775808)
+        df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(int)
+        df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].astype(str)
+        df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].replace({'-9223372036854775808': np.nan})
 
-        df_imputed[lst_year_cols] = df_imputed[lst_year_cols].astype(int)
+
+        df_raw_data[lst_year_cols] = df_raw_data[lst_year_cols].astype(int)
+
     except:
         print("Categorical columns still have NAs")
 
-    return df_imputed
+    return df_raw_data
 
 def download_data():
 
@@ -101,8 +106,7 @@ def main(argv):
 
     df_imputed = ''
     if method == 'xgboost':
-        df_imputed, cols_to_impute = impute.xgboost_impute(dct_data, dct_param)
-        dct_data['cols_to_impute'] = cols_to_impute
+        df_imputed = impute.xgboost_impute(dct_data, dct_param)
 
 
     if method == 'knn':
