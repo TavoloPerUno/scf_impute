@@ -23,13 +23,16 @@ dct_param = {'data': os.path.join('..', 'data'),
              'missing_val': 'nan'}
 
 def prepare_for_upload(dct_data, df_imputed):
-    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col not in dct_data['lst_skipped_cols']]
-    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col not in dct_data['lst_skipped_cols']]
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in dct_data['cols_to_impute']]
+    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col in dct_data['cols_to_impute']]
 
-    df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(int)
-    df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(str)
+    try:
+        df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(int)
+        df_imputed[lst_char_cols] = df_imputed[lst_char_cols].astype(str)
 
-    df_imputed[lst_year_cols] = df_imputed[lst_year_cols].astype(int)
+        df_imputed[lst_year_cols] = df_imputed[lst_year_cols].astype(int)
+    except:
+        print("Categorical columns still have NAs")
 
     return df_imputed
 
@@ -98,7 +101,8 @@ def main(argv):
 
     df_imputed = ''
     if method == 'xgboost':
-        df_imputed = impute.xgboost_impute(dct_data, dct_param)
+        df_imputed, cols_to_impute = impute.xgboost_impute(dct_data, dct_param)
+        dct_data['cols_to_impute'] = cols_to_impute
 
 
     if method == 'knn':

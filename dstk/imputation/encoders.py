@@ -39,12 +39,16 @@ class CustomLabelEncoder(LabelEncoder):
             print("y contains new labels: %s" % str(diff))
             print('Classes: ')
             print(self.classes_)
-            predicted_classes = np.unique(labls)
+            print('Predicted classes:')
+            print(np.unique(labls))
+            predicted_classes = np.unique(labls[~np.isnan(labls)])
             for new_class in diff:
                 index = np.argwhere(predicted_classes == new_class)
                 predicted_classes = np.delete(predicted_classes, index)
             predicted_classes.sort()
             labls = np.clip(y, min(predicted_classes),max(predicted_classes))
+            print('New labels:')
+            print(labls)
 
         return self.classes_[labls]
 

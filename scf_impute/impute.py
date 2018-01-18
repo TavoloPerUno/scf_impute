@@ -62,7 +62,7 @@ def xgboost_impute(dct_data, dct_param):
         print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
 
     df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])
-    return df_raw_data
+    return df_raw_data, lst_cols_to_impute
 
 def glrm_impute(dct_data, dct_param):
 
