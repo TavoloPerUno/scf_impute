@@ -126,18 +126,17 @@ def main(argv):
 
     df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=True)
 
-    dct_data_new = dict()
-
-    if os.path.isfile(os.path.join(dct_param['data'], 'variables.pickle')):
-        with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
-            dct_data_new = pickle.load(handle)
-
-    for key in dct_data_new:
-        if key in dct_data:
-
-            dct_data_new.pop(key, None)
-
-    dct_data.update(dct_data_new)
+    # dct_data_new = dict()
+    #
+    # if os.path.isfile(os.path.join(dct_param['data'], 'variables.pickle')):
+    #     with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
+    #         dct_data_new = pickle.load(handle)
+    #
+    # # for key in dct_data_new:
+    # #     if key in dct_data:
+    # #         dct_data_new.pop(key, None)
+    #
+    # dct_data.update(dct_data_new)
 
     with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
