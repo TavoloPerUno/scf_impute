@@ -16,7 +16,7 @@ def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None, rando
         feature_encoder=StringFeatureEncoder(missing_marker=missing_string_marker),
         missing_features=missing_features,
         random_state = random_state,
-        n_jobs = multiprocessing.cpu_count() + 5
+        n_jobs = multiprocessing.cpu_count()
     )
 
 
