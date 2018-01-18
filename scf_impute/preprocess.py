@@ -25,7 +25,7 @@ def track_holdout(dct_data, dct_param):
         # 5. Next row
 
         dct_removed = {}
-        tot_rows = len(train_id)
+        tot_rows = len(test_id)
 
 
         dct_removed_reverse = {}
