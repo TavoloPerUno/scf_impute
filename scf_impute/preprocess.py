@@ -25,7 +25,7 @@ def track_holdout(dct_data, dct_param):
         # 5. Next row
 
         dct_removed = {}
-
+        tot_rows = len(train_id)
 
 
         dct_removed_reverse = {}
@@ -67,6 +67,8 @@ def track_holdout(dct_data, dct_param):
 
             for col in dct_removed[i]:
                 dct_removed_reverse[col] = ','.join(filter(None, (dct_removed_reverse.setdefault(col, ''), str(i))))
+
+            print("Finished withholding %s of %s rows" % (str(len(list(dct_removed.keys())))), str(tot_rows))
 
         holdout_idx = util.key_val_products(dct_removed)
 
