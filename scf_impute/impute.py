@@ -31,12 +31,27 @@ def xgboost_impute(dct_data, dct_param):
 
     df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
+    lst_cols_to_impute = lst_char_cols + lst_num_cols
+
+    for col in lst_cols_to_impute:
+        if not df_raw_data[col].isnull().any():
+            lst_cols_to_impute.remove(col)
+
+    random.seed(dct_param['nrun'] * 100)
+
+    random.shuffle(lst_cols_to_impute)
+
+    lst_parts = [lst_cols_to_impute[x:x + 25] for x in range(0, len(lst_cols_to_impute), 25)]
+
     for char_col in lst_char_cols:
         if char_col in df_raw_data.columns:
             df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
 
-    imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100)#, missing_features=[cols])  # treat 'UNKNOWN' as missing value
-    df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
+    for cols in lst_parts:
+        imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100,
+                                 missing_features=cols)  # treat 'UNKNOWN' as missing value
+        df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
+        print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
 
     df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])
     return df_raw_data
