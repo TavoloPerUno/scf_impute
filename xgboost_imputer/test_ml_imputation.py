@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 from pandas.util.testing import assert_frame_equal
-from .ml_imputation import MLImputer
-from .encoders import StringFeatureEncoder
+from xgboost_imputer.ml_imputation import MLImputer
+from xgboost_imputer.encoders import StringFeatureEncoder
 
 
 def test_MLImputer_imputes_missing_values():

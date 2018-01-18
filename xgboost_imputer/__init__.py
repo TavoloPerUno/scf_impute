@@ -1,19 +1,23 @@
 from xgboost.sklearn import XGBClassifier, XGBRegressor
 import numpy as np
 import pandas as pd
-from dstk.imputation.ml_imputation import MLImputer
-from dstk.imputation.encoders import MasterExploder, StringFeatureEncoder
-from dstk.imputation.utils import mask_missing
+from xgboost_imputer.ml_imputation import MLImputer
+from xgboost_imputer.encoders import MasterExploder, StringFeatureEncoder
+from xgboost_imputer.utils import mask_missing
 import multiprocessing
 
+
 def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None, random_state=10):
-    xgbClassifier = XGBClassifier(seed=random_state, nthread=multiprocessing.cpu_count())
-    xgbRegressor = XGBRegressor(seed=random_state, nthread=multiprocessing.cpu_count())
+
+
     return MLImputer(
-        base_classifier=xgbClassifier,
-        base_regressor=xgbRegressor,
+        base_classifier=XGBClassifier,
+        base_regressor=XGBRegressor,
         feature_encoder=StringFeatureEncoder(missing_marker=missing_string_marker),
-        missing_features=missing_features)
+        missing_features=missing_features,
+        random_state = random_state,
+        n_jobs = multiprocessing.cpu_count() + 5
+    )
 
 
 def sample_dataset():

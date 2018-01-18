@@ -2,7 +2,7 @@ import pandas as pd
 from pandas.util.testing import assert_frame_equal
 import numpy as np
 
-from dstk.imputation.encoders import MasterExploder, StringFeatureEncoder
+from xgboost_imputer.encoders import MasterExploder, StringFeatureEncoder
 
 
 def test_master_exploder_encodes_ints_bools_floats_strings():

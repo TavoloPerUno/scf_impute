@@ -16,40 +16,6 @@ dstk.imputation.test_encoders
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import Imputer, LabelEncoder
-from sklearn.utils.validation import check_is_fitted
-
-class CustomLabelEncoder(LabelEncoder):
-    def inverse_transform(self, y):
-        """Transform labels back to original encoding.
-        Parameters
-        ----------
-        y : numpy array of shape [n_samples]
-            Target values.
-        Returns
-        -------
-        y : numpy array of shape [n_samples]
-        """
-        check_is_fitted(self, 'classes_')
-
-        diff = np.setdiff1d(y, np.arange(len(self.classes_)))
-
-        labls = np.asarray(y)
-        if len(diff):
-            print("y contains new labels: %s" % str(diff))
-            print('Classes: ')
-            print(self.classes_)
-            print('Predicted classes:')
-            print(np.unique(labls))
-            predicted_classes = np.unique(labls[~np.isnan(labls)])
-            for new_class in diff:
-                index = np.argwhere(predicted_classes == new_class)
-                predicted_classes = np.delete(predicted_classes, index)
-            predicted_classes.sort()
-            labls = np.clip(y, min(predicted_classes),max(predicted_classes))
-            print('New labels:')
-            print(labls)
-
-        return self.classes_[labls]
 
 
 class MissingNumericEncoder(object):
@@ -206,7 +172,7 @@ class StringFeatureEncoder(object):
             col = X[c]
             if col.dtype != 'object':
                 continue
-            self.encoders[c] = CustomLabelEncoder().fit(
+            self.encoders[c] = LabelEncoder().fit(
                 list(col) + [self.missing_marker])
         return self
 

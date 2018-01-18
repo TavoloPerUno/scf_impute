@@ -2,9 +2,8 @@ from sklearn.pipeline import Pipeline
 import pandas as pd
 import numpy as np
 
-from .encoders import IdentityEncoder
-from .utils import missing_mask
-from ..utils import logger
+from xgboost_imputer.encoders import IdentityEncoder
+from xgboost_imputer.utils import missing_mask
 
 
 class MLImputer(object):
@@ -26,7 +25,9 @@ class MLImputer(object):
                  base_regressor=None,
                  base_imputer=IdentityEncoder,
                  feature_encoder=IdentityEncoder(),
-                 missing_features=None):
+                 missing_features=None,
+                 random_state = 0,
+                 n_jobs = 8):
         """
         :param base_classifier: the sklearn-like classifier used to impute categorical columns
         :param base_regressor: the sklearn-like regressor used to impute continous columns
@@ -51,6 +52,8 @@ class MLImputer(object):
         self.col2feats = {}
         self.col2type = {}
         self.missing_features = missing_features
+        self.random_state = random_state
+        self.n_jobs = n_jobs
 
     def __str__(self):
         return "MLImputer(%s, %s, %s, %s)" % (
@@ -75,14 +78,14 @@ class MLImputer(object):
             else:
                 self.col2type[col] = 'integer'
 
-            logger.info("fitting MLImputer on %s column %s. %s column out of %s"
+            print("fitting MLImputer on %s column %s. %s column out of %s"
                         % (self.col2type[col], col, i + 1, len(self.column_set)))
 
             feats = self.col2feats[col]
             if np.issubdtype(column.dtype, np.floating):
-                model = self.base_regressor
+                model = self.base_regressor(random_state=self.random_state, n_jobs=self.n_jobs)
             else:
-                model = self.base_classifier
+                model = self.base_classifier(random_state=self.random_state, n_jobs=self.n_jobs)
 
             X = df.get(feats)[~missing_mask(column)].reset_index(drop=True)
             y = column[~missing_mask(column)].values
@@ -93,7 +96,7 @@ class MLImputer(object):
             imputer = Pipeline(
                 [('encoder', self.base_imputer()), ('imputer', model)])
             self.col2imputer[col] = imputer.fit(X, y)
-            logger.info('column imputer fitted on %s column' % col)
+            print('column imputer fitted on %s column' % col)
         return self
 
     def transform(self, df, proba=False):

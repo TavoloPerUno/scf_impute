@@ -94,10 +94,14 @@ def track_holdout(dct_data, dct_param):
     empty_cols.extend(df_raw_data.columns[df_raw_data.isnull().all()].tolist())
     df_raw_data = df_raw_data.dropna(axis=1, how='all')
 
+    if len(empty_cols) > 0:
+        df_raw_data.drop(empty_cols, axis=1, inplace=True)
+    dct_data['empty_cols'] = empty_cols
+
     # for k in dct_removed:
     #     dct_removed[k] = [col for col in dct_removed[k] if col not in empty_cols]
 
-    df_raw_data[empty_cols] = dct_data['df_full_cleaned_data'][empty_cols]
+    # df_raw_data[empty_cols] = dct_data['df_full_cleaned_data'][empty_cols]
 
     dct_data['df_raw_data'] = df_raw_data
 

@@ -1,4 +1,4 @@
-from dstk.imputation import DefaultImputer
+from xgboost_imputer import DefaultImputer
 import os
 import pandas as pd
 import numpy as np
@@ -26,44 +26,20 @@ def xgboost_impute(dct_data, dct_param):
     df_raw_data = dct_data['df_raw_data']
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
 
-
     lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
     lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
 
     df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
-    # lst_cols_to_impute = lst_char_cols + lst_num_cols
-    #
-    # for col in lst_cols_to_impute:
-    #     if not df_raw_data[col].isnull().any():
-    #         lst_cols_to_impute.remove(col)
-    #
-    # random.seed(dct_param['nrun'] * 100)
-    #
-    # random.shuffle(lst_cols_to_impute)
-    #
-    # unique_count = df_raw_data[lst_cols_to_impute].nunique().values
-    # idx_split = [val[0] for val in np.argwhere(unique_count <= 2).tolist()]
-
     for char_col in lst_char_cols:
         if char_col in df_raw_data.columns:
             df_raw_data[char_col] = df_raw_data[char_col].fillna('nan')
 
-
-
-
-
-    # lst_parts =[lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
-    # for cols in lst_cols_to_impute:
-
     imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100)#, missing_features=[cols])  # treat 'UNKNOWN' as missing value
     df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
-        # if cols in lst_char_cols:
-        #     print(df_raw_data[cols].unique())
-        # print("(%s of %s)" % (str(lst_cols_to_impute.index(cols) + 1), str(len(lst_cols_to_impute))))
 
     df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])
-    return df_raw_data#, lst_cols_to_impute
+    return df_raw_data
 
 def glrm_impute(dct_data, dct_param):
 

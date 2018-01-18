@@ -39,6 +39,8 @@ def prepare_for_upload(dct_data, df_raw_data):
     except:
         print("Categorical columns still have NAs")
 
+    df_raw_data[dct_data['empty_cols']] = dct_data['df_full_cleaned_data'][dct_data['empty_cols']]
+
     return df_raw_data
 
 def download_data():
