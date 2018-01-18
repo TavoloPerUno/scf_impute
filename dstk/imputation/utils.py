@@ -42,7 +42,7 @@ def missing_mask(array):
     if np.issubdtype(array.dtype, np.floating):
         return np.isnan(array)
     else:
-        return array == -9223372036854775808
+        return array == -1
 
 
 def mask_missing(values, fill_value=0):

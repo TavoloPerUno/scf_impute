@@ -54,7 +54,6 @@ def xgboost_impute(dct_data, dct_param):
 
 
     lst_parts =[lst_cols_to_impute[i:j] for i, j in zip([0] + idx_split, idx_split + [None])]
-
     for cols in lst_parts:
 
         imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100, missing_features=cols)  # treat 'UNKNOWN' as missing value

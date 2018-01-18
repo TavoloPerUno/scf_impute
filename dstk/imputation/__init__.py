@@ -4,11 +4,11 @@ import pandas as pd
 from dstk.imputation.ml_imputation import MLImputer
 from dstk.imputation.encoders import MasterExploder, StringFeatureEncoder
 from dstk.imputation.utils import mask_missing
-
+import multiprocessing
 
 def DefaultImputer(missing_string_marker='UNKNOWN', missing_features=None, random_state=10):
-    xgbClassifier = XGBClassifier(seed=random_state)
-    xgbRegressor = XGBRegressor(seed=random_state)
+    xgbClassifier = XGBClassifier(seed=random_state, nthread=multiprocessing.cpu_count())
+    xgbRegressor = XGBRegressor(seed=random_state, nthread=multiprocessing.cpu_count())
     return MLImputer(
         base_classifier=xgbClassifier,
         base_regressor=xgbRegressor,

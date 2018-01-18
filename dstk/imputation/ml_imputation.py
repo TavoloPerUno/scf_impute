@@ -70,7 +70,7 @@ class MLImputer(object):
             column = df.get(col)
             if np.issubdtype(column.dtype, np.floating):
                 self.col2type[col] = 'numeric'
-            elif all(x in {-9223372036854775808, 0, 1, False, True} for x in column):
+            elif all(x in {-1, 0, 1, False, True} for x in column):
                 self.col2type[col] = 'boolean'
             else:
                 self.col2type[col] = 'integer'
@@ -85,7 +85,9 @@ class MLImputer(object):
                 model = self.base_classifier
 
             X = df.get(feats)[~missing_mask(column)].reset_index(drop=True)
+
             y = column[~missing_mask(column)]
+            print(y.unique())
             if len(y) == 0:
                 raise ValueError(
                     'need at least 1 nonmissing value to train imputer')
