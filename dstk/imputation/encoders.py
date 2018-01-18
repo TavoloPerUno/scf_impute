@@ -32,7 +32,7 @@ class CustomLabelEncoder(LabelEncoder):
         """
         check_is_fitted(self, 'classes_')
 
-        diff = np.setdiff1d(y, np.arange(len(self.classes_[self.classes_ != self.missing_marker])))
+        diff = np.setdiff1d(y, np.arange(len(self.classes_[self.classes_ != 'nan'])))
 
         labls = np.asarray(y)
         if len(diff):
@@ -50,7 +50,7 @@ class CustomLabelEncoder(LabelEncoder):
             print('New labels:')
             print(labls)
 
-        return self.classes_[self.classes_ != self.missing_marker][labls]
+        return self.classes_[self.classes_ != 'nan'][labls]
 
 
 class MissingNumericEncoder(object):
