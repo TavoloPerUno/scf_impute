@@ -3,7 +3,7 @@ library(doParallel)
 
 #setwd("~/Documents/pyWorkspace/imputation/r")
 
-df_raw <- read.csv('../data/withheld_cleaned.csv')
+df_raw <- read.csv('../data/withheld_cleaned.csv', row.names=1)
 
 df_col_structure <- read.csv('../data/col_structure.csv', stringsAsFactors=FALSE)
 
