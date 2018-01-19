@@ -23,9 +23,10 @@ parser.add_argument('--redowithholding', type=int,
 dct_param = {'data': os.path.join('..', 'data'),
              'missing_val': 'nan'}
 
+
 def prepare_for_upload(dct_data, df_raw_data):
-    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns]
-    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col in df_raw_data.columns]
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col if col in df_raw_data.columns and not df_raw_data[col].isnull().any()]
+    lst_year_cols = [col for col in dct_data['lst_year_cols'] if col if col in df_raw_data.columns and not df_raw_data[col].isnull().any()]
 
     try:
         df_raw_data[lst_char_cols] = df_raw_data[lst_char_cols].fillna(-9223372036854775808)

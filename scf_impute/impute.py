@@ -23,6 +23,7 @@ from scipy import stats
 #     return df_filled_in
 
 def xgboost_impute(dct_data, dct_param):
+
     df_raw_data = dct_data['df_raw_data']
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
 
@@ -31,11 +32,7 @@ def xgboost_impute(dct_data, dct_param):
 
     df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
-    lst_cols_to_impute = lst_char_cols + lst_num_cols
-
-    for col in lst_cols_to_impute:
-        if not df_raw_data[col].isnull().any():
-            lst_cols_to_impute.remove(col)
+    lst_cols_to_impute = [col for col in lst_char_cols + lst_num_cols if  df_raw_data[col].isnull().any()]
 
     random.seed(dct_param['nrun'] * 100)
 
