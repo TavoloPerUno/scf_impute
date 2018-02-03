@@ -65,6 +65,7 @@ def main(argv):
     dct_data = dict()
     dct_param['nrun'] = nrun
     dct_param['withhold'] = withhold
+    dct_param['method'] = method
     if os.path.isfile(os.path.join(dct_param['data'], 'variables.pickle')):
         with open(os.path.join(dct_param['data'], 'variables.pickle'), 'rb') as handle:
             dct_data = pickle.load(handle)
@@ -121,11 +122,17 @@ def main(argv):
     if method == 'glrm':
         df_imputed = impute.glrm_impute(dct_data, dct_param)
 
+    df_imputed = prepare_for_upload(dct_data, df_imputed)
+    df_imputed.set_index(dct_data['df_full_cleaned_data'].index, inplace=True)
 
-    df_imputed = prepare_for_upload(dct_data, analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed))
-    dct_data[method + '_imputed_' + str(nrun)] = df_imputed
+    df_imputed_with_analysis_variables = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
 
-    df_imputed.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=True)
+
+
+    dct_data[method + '_imputed_' + str(nrun)] = df_imputed_with_analysis_variables
+    dct_data[method + '_imputed_raw' + str(nrun)] = df_imputed
+
+    df_imputed_with_analysis_variables.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=True)
 
     # dct_data_new = dict()
     #

@@ -12,79 +12,81 @@ def track_holdout(dct_data, dct_param):
 
     dct_data['df_full_cleaned_data'] = df_raw_data.copy()
 
-    if dct_param['withhold']:
+    if dct_param['nrun'] != 100:
 
-        train_id, test_id = sklearn.model_selection.train_test_split(df_raw_data.index, train_size=0.8, random_state=10)
+        if dct_param['withhold']:
 
-
-
-        # 1. Read a row
-        # 2. Pick 10 or less numeric values that exist
-        # 3. Record the row number and associated 10 or less columns
-        # 4. Make the 10 or less numeric values missing
-        # 5. Next row
-
-        dct_removed = {}
-        tot_rows = len(test_id)
-
-
-        dct_removed_reverse = {}
-
-        for i in test_id:
-            # Select a row
-            row = df_raw_data.loc[i,]
-
-            # Find columns with data
-            existing_nums = list(row[dct_data['lst_num_cols']].index[
-                                        row[dct_data['lst_num_cols']].notnull()])
-
-            existing_chars = list(row[dct_data['lst_char_cols']].index[
-                                        row[dct_data['lst_char_cols']].notnull()])
+            train_id, test_id = sklearn.model_selection.train_test_split(df_raw_data.index, train_size=0.8, random_state=10)
 
 
 
-            dct_unique_others = dict(df_raw_data.loc[df_raw_data.index != i, existing_chars].nunique(dropna=False))
-            dct_unique = dict(df_raw_data.loc[:, existing_chars].nunique(dropna=False))
+            # 1. Read a row
+            # 2. Pick 10 or less numeric values that exist
+            # 3. Record the row number and associated 10 or less columns
+            # 4. Make the 10 or less numeric values missing
+            # 5. Next row
 
-            existing_chars = [val[0] for val in dct_unique_others.items() & dct_unique.items()]
+            dct_removed = {}
+            tot_rows = len(test_id)
 
-            existing_columns = existing_nums + existing_chars
+
+            dct_removed_reverse = {}
+
+            for i in test_id:
+                # Select a row
+                row = df_raw_data.loc[i,]
+
+                # Find columns with data
+                existing_nums = list(row[dct_data['lst_num_cols']].index[
+                                            row[dct_data['lst_num_cols']].notnull()])
+
+                existing_chars = list(row[dct_data['lst_char_cols']].index[
+                                            row[dct_data['lst_char_cols']].notnull()])
 
 
-            # Miniumum of length of existing columns or 10
-            num_valuesdropped = max(0, min(len(existing_columns) - 5, 10))
-            random.seed(10 + i)
-            random.shuffle(existing_columns)
-            kept = pd.Index(existing_columns)
-            # Create list of indices and then randomly select values that will be dropped for analysis
-            kept_indices = list(range(len(kept)))
-            random.seed(10 + i)
-            columns_dropped = kept[random.sample(kept_indices, num_valuesdropped)]
 
-            dct_removed[i] = columns_dropped
+                dct_unique_others = dict(df_raw_data.loc[df_raw_data.index != i, existing_chars].nunique(dropna=False))
+                dct_unique = dict(df_raw_data.loc[:, existing_chars].nunique(dropna=False))
 
-            df_raw_data.loc[i, dct_removed[i]] = np.nan
+                existing_chars = [val[0] for val in dct_unique_others.items() & dct_unique.items()]
 
-            for col in dct_removed[i]:
-                dct_removed_reverse[col] = ','.join(filter(None, (dct_removed_reverse.setdefault(col, ''), str(i))))
+                existing_columns = existing_nums + existing_chars
 
-            print("Finished withholding %s of %s rows" % (str(len(list(dct_removed.keys()))), str(tot_rows)))
 
-        holdout_idx = util.key_val_products(dct_removed)
+                # Miniumum of length of existing columns or 10
+                num_valuesdropped = max(0, min(len(existing_columns) - 5, 10))
+                random.seed(10 + i)
+                random.shuffle(existing_columns)
+                kept = pd.Index(existing_columns)
+                # Create list of indices and then randomly select values that will be dropped for analysis
+                kept_indices = list(range(len(kept)))
+                random.seed(10 + i)
+                columns_dropped = kept[random.sample(kept_indices, num_valuesdropped)]
 
-        # dct_removed = util.reverse_map(dct_removed)
+                dct_removed[i] = columns_dropped
 
-        # for k in dct_removed.keys():
-        #     dct_removed[k] = ",".join(map(str, dct_removed[k]))
+                df_raw_data.loc[i, dct_removed[i]] = np.nan
 
-        dct_data['df_removed'] = pd.DataFrame(dct_removed_reverse, index=[0])
+                for col in dct_removed[i]:
+                    dct_removed_reverse[col] = ','.join(filter(None, (dct_removed_reverse.setdefault(col, ''), str(i))))
 
-        dct_data['holdout_idx'] = holdout_idx
+                print("Finished withholding %s of %s rows" % (str(len(list(dct_removed.keys()))), str(tot_rows)))
 
-    else:
-        for col in dct_data['df_removed'].columns:
-            rows = [int(x) for x in dct_data['df_removed'].loc[0, col].split(",")]
-            df_raw_data.loc[rows, col] = np.nan
+            holdout_idx = util.key_val_products(dct_removed)
+
+            # dct_removed = util.reverse_map(dct_removed)
+
+            # for k in dct_removed.keys():
+            #     dct_removed[k] = ",".join(map(str, dct_removed[k]))
+
+            dct_data['df_removed'] = pd.DataFrame(dct_removed_reverse, index=[0])
+
+            dct_data['holdout_idx'] = holdout_idx
+
+        else:
+            for col in dct_data['df_removed'].columns:
+                rows = [int(x) for x in dct_data['df_removed'].loc[0, col].split(",")]
+                df_raw_data.loc[rows, col] = np.nan
 
 
 
@@ -118,7 +120,12 @@ def prepare(dct_data, dct_param):
     df_xvariables = dct_data['df_xvariables']
 
     util.pythonize_colnames(df_xvariables)
+
     df_xvariables['na_code'] = df_xvariables['na_code'].fillna(0)
+
+    if dct_param['nrun'] != 100:
+
+        df_raw_data = dct_data[dct_param['method'] + '_imputed_100']
 
     df_raw_data = df_raw_data[list(filter(lambda x: x.startswith('x') and
                                                     x not in list(df_xvariables[df_xvariables['nominal_character_c_or_numeric_n'].isnull()].x),
@@ -144,16 +151,18 @@ def prepare(dct_data, dct_param):
     df_raw_data = df_raw_data.dropna(axis=1, how='all')
     dct_data['df_raw_data'] = df_raw_data
     dct_data['df_xvariables'] = df_xvariables
-    dct_data['lst_char_cols'] = lst_char_cols
-    dct_data['lst_num_cols'] = lst_num_cols
-    dct_data['lst_year_cols'] = lst_year_cols
-    dct_data['lst_skipped_cols'] = skip_cols
+
+    if dct_param['nrun'] != 100:
+        dct_data['lst_char_cols'] = lst_char_cols
+        dct_data['lst_num_cols'] = lst_num_cols
+        dct_data['lst_year_cols'] = lst_year_cols
+        dct_data['lst_skipped_cols'] = skip_cols
 
 
-    dct_data['df_col_structure'] = pd.DataFrame({'char_col': ','.join(lst_char_cols),
-                                     'num_col': ','.join(lst_num_cols),
-                                     'year_col': ','.join(lst_year_cols),
-                                     'skip_col': ','.join(list(cols_to_drop))}, index=[0])
+        dct_data['df_col_structure'] = pd.DataFrame({'char_col': ','.join(lst_char_cols),
+                                         'num_col': ','.join(lst_num_cols),
+                                         'year_col': ','.join(lst_year_cols),
+                                         'skip_col': ','.join(list(cols_to_drop))}, index=[0])
 
     lst_char_cols = [col for col in lst_char_cols if col in df_raw_data]
 

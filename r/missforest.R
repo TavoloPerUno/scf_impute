@@ -5,6 +5,8 @@ library(doParallel)
 
 df_raw <- read.csv('../data/withheld_cleaned.csv', row.names=1)
 
+df_raw <- read.csv('../data/full_cleaned.csv', row.names=1)
+
 df_col_structure <- read.csv('../data/col_structure.csv', stringsAsFactors=FALSE)
 
 # df_raw[unlist(strsplit(df_col_structure$year_col[1], ","))][is.na(df_raw[unlist(strsplit(df_col_structure$year_col[1], ","))])] <- -1
@@ -29,8 +31,7 @@ df_num_cols[] <- lapply(df_num_cols, as.numeric)
 df_raw[colnames(df_char_cols)] <- df_char_cols
 df_raw[colnames(df_num_cols)] <- df_num_cols
 
-
-registerDoParallel(cores = 16)
+registerDoParallel(cores = 24)
 imputed <- NA
 imputed <- missForest(xmis = df_raw,
                       ntree = 100,
