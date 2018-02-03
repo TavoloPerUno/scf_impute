@@ -21,9 +21,9 @@ class Knn_Imputer:
         """
         clf = None
         if not is_categorical:
-            clf = neighbors.KNeighborsRegressor(n_neighbors=k)
+            clf = neighbors.KNeighborsRegressor(n_neighbors=k, n_jobs=-1)
         else:
-            clf = neighbors.KNeighborsClassifier(n_neighbors=k)
+            clf = neighbors.KNeighborsClassifier(n_neighbors=k, n_jobs=-1)
         # use column not null to train the kNN classifier
         missing_idxes = np.where(pd.isnull(X[:, column]))[0]
         if len(missing_idxes) == 0:
