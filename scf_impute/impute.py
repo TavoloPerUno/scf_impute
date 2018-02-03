@@ -22,24 +22,28 @@ from scipy import stats
 #     df_filled_in = pd.DataFrame(data=filled_in, columns=df_raw_data.columns, index=df_raw_data.index)
 #     return df_filled_in
 
-def xgboost_impute(dct_data, dct_param):
 
-    df_raw_data = dct_data['df_raw_data']
+def xgboost_impute(dct_data, dct_param):
+    df_raw_data = dct_data['df_raw_data'].copy()
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
 
-    lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
-    lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
-
-    df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
+    lst_char_cols = [col for col in dct_data['lst_char_cols'] if
+                     col in df_raw_data.columns and col not in dct_data['lst_skipped_cols'] and col not in dct_data['empty_cols']]
+    lst_num_cols = [col for col in dct_data['lst_num_cols'] if
+                    col in df_raw_data.columns and col not in dct_data['lst_skipped_cols'] and col not in dct_data['empty_cols']]
 
     while True:
 
-        lst_cols_to_impute = [col for col in lst_char_cols + lst_num_cols if  df_raw_data[col].isnull().any()]
+        df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
-        print("Number of columns to be imputed: %s" %(str(len(lst_cols_to_impute))))
+        lst_cols_to_impute = lst_char_cols + lst_num_cols
+        for col in lst_cols_to_impute:
+            if not df_raw_data[col].isnull().any():
+                lst_cols_to_impute.remove(col)
 
         if len(lst_cols_to_impute) < 1:
             break
+        print("Number of columns to be imputed: %s" % (str(len(lst_cols_to_impute))))
 
         random.seed(dct_param['nrun'] * 100)
 
@@ -87,10 +91,10 @@ def glrm_impute(dct_data, dct_param):
     x = 0
 
 def knn_impute(dct_data, dct_param, k):
-    df_raw_data = dct_data['df_raw_data']
-    df_raw_data.replace('nan', np.nan)
+    df_raw_data = dct_data['df_raw_data'].copy()
+    # df_raw_data.replace('nan', np.nan)
     df_raw_data, df_col_mu_std = scale(df_raw_data, dct_data['lst_num_cols'])
-    impute = Knn_Imputer()
+
 
     lst_char_cols = [col for col in dct_data['lst_char_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
     lst_num_cols = [col for col in dct_data['lst_num_cols'] if col in df_raw_data.columns and col not in dct_data['lst_skipped_cols']]
@@ -98,6 +102,8 @@ def knn_impute(dct_data, dct_param, k):
     dct_col_mean_mode = get_col_mean_mode(df_raw_data, lst_num_cols, lst_char_cols)
 
     lst_cols_to_impute = lst_char_cols + lst_num_cols
+
+    df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
     for col in lst_cols_to_impute:
         if not df_raw_data[col].isnull().any():
@@ -107,6 +113,8 @@ def knn_impute(dct_data, dct_param, k):
 
     random.shuffle(lst_cols_to_impute)
     np_mean_mode = np.asarray([dct_col_mean_mode[col] if col in dct_col_mean_mode else 0 for col in df_raw_data.columns])
+
+    impute = Knn_Imputer()
 
     for col in lst_cols_to_impute:
         is_categorical = True

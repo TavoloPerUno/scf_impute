@@ -51,6 +51,9 @@ def download_data():
     # dct_data['df_knn_imputed'] = pd.read_csv(os.path.join(dct_param['data'], 'knn_imputed.csv'))
     dct_data['df_raw_data'] = pd.read_csv(os.path.join(dct_param['data'], 'raw_2013.csv'))
     dct_data['df_xvariables'] = pd.read_excel(os.path.join(dct_param['data'], 'xvariables-final.xlsx'))
+    dct_data['df_missing_probabilities'] = pd.read_csv(os.path.join(dct_param['data'], 'missing_probabilities.csv'), index_col=0)
+    dct_data['df_missing_indicators'] = pd.read_csv(os.path.join(dct_param['data'], 'missing_indicator.csv'),
+                                                       index_col=0)
 
     return dct_data
 
@@ -99,7 +102,10 @@ def main(argv):
 
         dct_data.update(preprocess.prepare(dct_data, dct_param))
 
-        dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
+        for i in range(1, 6):
+            dct_data['df_removed_' + str(i)].to_csv(os.path.join(dct_param['data'], 'withheld_' + str(i) + '.csv'), index=False)
+
+        # dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
         dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=True)
         dct_data['df_raw_data'].to_csv(os.path.join(dct_param['data'], 'withheld_cleaned.csv'), index=True)
         dct_data['df_col_structure'].to_csv(os.path.join(dct_param['data'], 'col_structure.csv'), index=False)

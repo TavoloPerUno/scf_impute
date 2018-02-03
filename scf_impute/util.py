@@ -13,3 +13,6 @@ def key_val_products(dicts):
 
 def pythonize_colnames(df):
     df.columns = list(map(lambda each:re.sub('[^0-9a-zA-Z]+', '_', each).lower(), df.columns))
+
+def chunkify(lst,n):
+    return filter(None, [lst[i::n] for i in range(n)])
