@@ -102,8 +102,9 @@ def main(argv):
 
         dct_data.update(preprocess.prepare(dct_data, dct_param))
 
-        for i in range(1, 6):
-            dct_data['df_removed_' + str(i)].to_csv(os.path.join(dct_param['data'], 'withheld_' + str(i) + '.csv'), index=False)
+        if nrun != 100:
+            for i in range(1, 6):
+                dct_data['df_removed_' + str(i)].to_csv(os.path.join(dct_param['data'], 'withheld_' + str(i) + '.csv'), index=False)
 
         # dct_data['df_removed'].to_csv(os.path.join(dct_param['data'], 'withheld.csv'), index=False)
         dct_data['df_full_cleaned_data'].to_csv(os.path.join(dct_param['data'], 'full_cleaned.csv'), index=True)
