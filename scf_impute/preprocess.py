@@ -198,10 +198,10 @@ def prepare(dct_data, dct_param):
     dct_data['df_xvariables'] = df_xvariables
 
     if dct_param['nrun'] == 100:
-        dct_data['lst_char_cols'] = lst_char_cols
-        dct_data['lst_num_cols'] = lst_num_cols
-        dct_data['lst_year_cols'] = lst_year_cols
-        dct_data['lst_skipped_cols'] = skip_cols
+        dct_data['lst_char_cols'] = list(set(lst_char_cols))
+        dct_data['lst_num_cols'] = list(set(lst_num_cols))
+        dct_data['lst_year_cols'] = list(set(lst_year_cols))
+        dct_data['lst_skipped_cols'] = list(set(skip_cols))
 
 
         dct_data['df_col_structure'] = pd.DataFrame({'char_col': ','.join(lst_char_cols),

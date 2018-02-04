@@ -129,15 +129,19 @@ def main(argv):
     if method == 'glrm':
         df_imputed = impute.glrm_impute(dct_data, dct_param)
 
+
     df_imputed = prepare_for_upload(dct_data, df_imputed)
     df_imputed.set_index(dct_data['df_full_cleaned_data'].index, inplace=True)
+    dct_data[method + '_imputed_raw' + str(nrun)] = df_imputed
+    with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
+        pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     df_imputed_with_analysis_variables = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
 
 
 
     dct_data[method + '_imputed_' + str(nrun)] = df_imputed_with_analysis_variables
-    dct_data[method + '_imputed_raw' + str(nrun)] = df_imputed
+
 
     df_imputed_with_analysis_variables.to_csv(os.path.join(dct_param['data'], method + '_imputed_' + str(nrun) + '.csv'), index=True)
 
