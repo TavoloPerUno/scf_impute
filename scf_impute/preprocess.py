@@ -62,10 +62,8 @@ def track_holdout(dct_data, dct_param):
 
         else:
 
-            for col in dct_data['lst_cols_to_withhold']:
-                if len(dct_data['dct_withhold_sets'][col]) >= dct_param['nrun']:
-                    df_raw_data.loc[dct_data['dct_withhold_sets'][col][dct_param['nrun'] - 1], col] = np.nan
-
+            for col in [item for item in dct_data['dct_withhold_sets'].keys() if len(dct_data['dct_withhold_sets'][item]) >= dct_param['nrun']]:
+                df_raw_data.loc[dct_data['dct_withhold_sets'][col][dct_param['nrun'] - 1], col] = np.nan
 
         #     # 1. Read a row
         #     # 2. Pick 10 or less numeric values that exist
@@ -147,6 +145,7 @@ def track_holdout(dct_data, dct_param):
         df_raw_data.drop(empty_cols, axis=1, inplace=True)
     dct_data['empty_cols'] = empty_cols
 
+
     # for k in dct_removed:
     #     dct_removed[k] = [col for col in dct_removed[k] if col not in empty_cols]
 
@@ -167,7 +166,7 @@ def prepare(dct_data, dct_param):
         df_raw_data.set_index('yy1', inplace=True)
 
     else:
-        df_raw_data = dct_data[dct_param['method'] + '_imputed_100'].copy()
+        df_raw_data = dct_data[dct_param['method'] + '_imputed_raw100'].copy()
 
     df_xvariables = dct_data['df_xvariables']
 
