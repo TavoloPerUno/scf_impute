@@ -1,11 +1,26 @@
 library(missForest)
 library(doParallel)
+library(dplyr)
+require(data.table)
 
 #setwd("~/Documents/pyWorkspace/imputation/r")
 
-df_raw <- read.csv('../data/withheld_cleaned.csv', row.names=1)
+df_withhold <- read.csv('../data/withheld_1.csv')
 
-df_raw <- read.csv('../data/full_cleaned.csv', row.names=1)
+df_withhold <- df_withhold %>%
+  mutate_all(as.character)
+
+load(file='../data/myEnvironment.rdata')
+
+df_imputed <- imputed$ximp
+
+withhold <- function(column){ 
+  x <- df_imputed[, column]
+  x[as.numeric(unlist(strsplit(df_withhold[,column][1], ",")))] <- NA
+  return (x)
+}
+
+df_imputed[,colnames(df_withhold[,!is.na(df_withhold)])] <- lapply(colnames(df_withhold[,!is.na(df_withhold)]), withhold)
 
 df_col_structure <- read.csv('../data/col_structure.csv', stringsAsFactors=FALSE)
 
@@ -15,7 +30,7 @@ df_col_structure <- read.csv('../data/col_structure.csv', stringsAsFactors=FALSE
 #                    unlist(strsplit(df_col_structure$char_col[1], ",")),
 #                    unlist(strsplit(df_col_structure$num_col[1], ",")))]
 # 
-
+df_raw <- df_imputed
 char_cols <- intersect(unlist(strsplit(df_col_structure$char_col[1], ",")), colnames(df_raw))
 num_cols <- intersect(c(unlist(strsplit(df_col_structure$num_col[1], ",")),
                         unlist(strsplit(df_col_structure$year_col[1], ","))), colnames(df_raw))
@@ -38,6 +53,6 @@ imputed <- missForest(xmis = df_raw,
                       parallelize = 'forests')
 
 
-save.image(file='../data/myEnvironment.RData')
+save.image(file='../data/iter_1.RData')
 
-write.csv(imputed, file='../data/missforest_imputed.csv')
+write.csv(imputed$ximp, file='../data/missforest_imputed_1.csv')
