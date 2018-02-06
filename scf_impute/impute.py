@@ -32,23 +32,29 @@ def xgboost_impute(dct_data, dct_param):
     lst_num_cols = [col for col in dct_data['lst_num_cols'] if
                     col in df_raw_data.columns and col not in dct_data['lst_skipped_cols'] and col not in dct_data['empty_cols']]
 
+
+
+    lst_cols_to_impute = lst_char_cols + lst_num_cols
+
+
+
     while True:
 
-        df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
-
-        lst_cols_to_impute = lst_char_cols + lst_num_cols
         lst_cols_to_impute = [col for col in list(df_raw_data.columns[df_raw_data.isnull().any()]) if
                               col in lst_cols_to_impute]
 
         if len(lst_cols_to_impute) < 1:
             break
+
+        df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
+
         print("Number of columns to be imputed: %s" % (str(len(lst_cols_to_impute))))
 
         random.seed(dct_param['nrun'] * 100)
 
         random.shuffle(lst_cols_to_impute)
 
-        lst_parts = [lst_cols_to_impute[x:x + 25] for x in range(0, len(lst_cols_to_impute), 25)]
+        lst_parts = [lst_cols_to_impute[x:x + 3] for x in range(0, len(lst_cols_to_impute), 3)]
 
         for char_col in lst_char_cols:
             if char_col in df_raw_data.columns:
