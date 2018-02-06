@@ -37,7 +37,7 @@ def xgboost_impute(dct_data, dct_param):
         df_raw_data[lst_num_cols] = df_raw_data[lst_num_cols].astype(float)
 
         lst_cols_to_impute = lst_char_cols + lst_num_cols
-        lst_cols_to_impute = [col for col in df_raw_data.columns[df_raw_data.isnull().any()] if
+        lst_cols_to_impute = [col for col in list(df_raw_data.columns[df_raw_data.isnull().any()]) if
                               col in lst_cols_to_impute]
 
         if len(lst_cols_to_impute) < 1:
@@ -59,7 +59,9 @@ def xgboost_impute(dct_data, dct_param):
                                      missing_features=cols)  # treat 'UNKNOWN' as missing value
             df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
             print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
-            new_cols_to_impute = [col for col in df_raw_data.columns[df_raw_data.isnull().any()] if
+
+            missing_cols = list(df_raw_data[lst_char_cols].columns[(df_raw_data[lst_char_cols] == 'nan').any()]) + list(df_raw_data.columns[df_raw_data.isnull().any()])
+            new_cols_to_impute = [col for col in missing_cols if
                                   col in lst_cols_to_impute]
             print("%s columns to go" % len(new_cols_to_impute))
 
