@@ -59,6 +59,9 @@ def xgboost_impute(dct_data, dct_param):
                                      missing_features=cols)  # treat 'UNKNOWN' as missing value
             df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
             print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
+            new_cols_to_impute = [col for col in df_raw_data.columns[df_raw_data.isnull().any()] if
+                                  col in lst_cols_to_impute]
+            print("%s columns to go" % len(new_cols_to_impute))
 
     df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])
     return df_raw_data
