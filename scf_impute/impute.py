@@ -54,7 +54,7 @@ def xgboost_impute(dct_data, dct_param):
 
         random.shuffle(lst_cols_to_impute)
 
-        lst_parts = [lst_cols_to_impute[x:x + 60] for x in range(0, len(lst_cols_to_impute), 60)]
+        lst_parts = [lst_cols_to_impute[x:x + 100] for x in range(0, len(lst_cols_to_impute), 100)]
 
         for char_col in lst_char_cols:
             if char_col in df_raw_data.columns:
@@ -62,12 +62,17 @@ def xgboost_impute(dct_data, dct_param):
 
         # df_raw_data['index'] = df_raw_data.index.copy()
 
-        imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100,
-                                 missing_features=lst_cols_to_impute)  # treat 'UNKNOWN' as missing value
-        df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
-        print("(%s of %s)" % (str(lst_cols_to_impute.index(lst_cols_to_impute[- 1])), str(len(lst_cols_to_impute))))
-        df_raw_data.to_csv(
-            os.path.join(dct_param['data'], 'xgboost_imputed_' + str(dct_param['nrun']) + '.csv'), index=True)
+        for cols in lst_parts:
+
+            imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100,
+                                     missing_features=cols)  # treat 'UNKNOWN' as missing value
+            df_filled = imputer.fit(df_raw_data).transform(df_raw_data)
+            df_raw_data.to_csv(
+                os.path.join(dct_param['data'], 'xgboost_filled_' + str(dct_param['nrun']) + '.csv'), index=True)
+            df_raw_data[cols] = df_filled[cols]
+            print("(%s of %s)" % (str(lst_cols_to_impute.index(lst_cols_to_impute[- 1])), str(len(lst_cols_to_impute))))
+            df_raw_data.to_csv(
+                os.path.join(dct_param['data'], 'xgboost_imputed_' + str(dct_param['nrun']) + '.csv'), index=True)
 
         # for cols in lst_parts:
 
