@@ -131,7 +131,7 @@ def main(argv):
 
 
     df_imputed = prepare_for_upload(dct_data, df_imputed)
-    df_imputed.set_index(dct_data['df_full_cleaned_data'].index, inplace=True)
+    # df_imputed.set_index(dct_data['df_full_cleaned_data'].index, inplace=True)
     dct_data[method + '_imputed_raw' + str(nrun)] = df_imputed
     with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)

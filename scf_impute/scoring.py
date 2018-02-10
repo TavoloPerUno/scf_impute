@@ -4,8 +4,7 @@ from scf_impute import master
 from scf_impute import impute
 from sklearn.metrics import mean_squared_error, accuracy_score
 
-def prepare_for_scores(dct_data, dct_param, file, nrun, with_impute=True):
-    df_imputed = pd.read_csv(file, index_col=0)
+def prepare_for_scores(dct_data, dct_param, df_imputed, nrun, with_impute=True):
 
     if with_impute:
         df_raw_data = dct_data['df_raw_data'].copy()

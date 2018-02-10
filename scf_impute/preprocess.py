@@ -60,10 +60,11 @@ def track_holdout(dct_data, dct_param):
 
                 dct_data['df_removed_' + str(i)] = df_removed
 
-        else:
 
-            for col in [item for item in dct_data['dct_withhold_sets'].keys() if len(dct_data['dct_withhold_sets'][item]) >= dct_param['nrun']]:
-                df_raw_data.loc[dct_data['dct_withhold_sets'][col][dct_param['nrun'] - 1], col] = np.nan
+
+        for col in [item for item in dct_data['dct_withhold_sets'].keys() if len(dct_data['dct_withhold_sets'][item]) >= dct_param['nrun']]:
+            df_raw_data.loc[dct_data['dct_withhold_sets'][col][dct_param['nrun'] - 1], col] = np.nan
+
 
         #     # 1. Read a row
         #     # 2. Pick 10 or less numeric values that exist
@@ -162,12 +163,14 @@ def prepare(dct_data, dct_param):
     if dct_param['nrun'] == 100:
         if 'Unnamed: 0' in df_raw_data.columns:
             del df_raw_data['Unnamed: 0']
+
         df_raw_data = df_raw_data.loc[df_raw_data['yy1'] != 0,]
         df_raw_data.set_index('yy1', inplace=True)
 
     else:
         df_raw_data = dct_data[dct_param['method'] + '_imputed_raw100'].copy()
 
+    
     df_xvariables = dct_data['df_xvariables']
 
     util.pythonize_colnames(df_xvariables)
