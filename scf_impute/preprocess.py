@@ -170,7 +170,7 @@ def prepare(dct_data, dct_param):
     else:
         df_raw_data = dct_data[dct_param['method'] + '_imputed_raw100'].copy()
 
-    
+
     df_xvariables = dct_data['df_xvariables']
 
     util.pythonize_colnames(df_xvariables)

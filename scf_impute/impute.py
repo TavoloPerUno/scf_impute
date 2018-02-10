@@ -43,7 +43,6 @@ def xgboost_impute(dct_data, dct_param):
         lst_cols_to_impute = [col for col in list(df_raw_data.columns[df_raw_data.isnull().any()]) if
                               col in lst_cols_to_impute]
 
-        lst_cols_to_impute = lst_cols_to_impute[0:3]
         if len(lst_cols_to_impute) < 1:
             break
 
