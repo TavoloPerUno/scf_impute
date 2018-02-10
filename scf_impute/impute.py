@@ -43,6 +43,7 @@ def xgboost_impute(dct_data, dct_param):
         lst_cols_to_impute = [col for col in list(df_raw_data.columns[df_raw_data.isnull().any()]) if
                               col in lst_cols_to_impute]
 
+        lst_cols_to_impute = lst_cols_to_impute[0:3]
         if len(lst_cols_to_impute) < 1:
             break
 
@@ -60,11 +61,15 @@ def xgboost_impute(dct_data, dct_param):
             if char_col in df_raw_data.columns:
                 df_raw_data[char_col].fillna('nan', inplace=True)
 
+        df_raw_data['yy1'] = df_raw_data.index.copy()
+
         for cols in lst_parts:
             imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100,
                                      missing_features=cols)  # treat 'UNKNOWN' as missing value
             df_raw_data = imputer.fit(df_raw_data).transform(df_raw_data)
             print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
+            df_raw_data.to_csv(
+                os.path.join(dct_param['data'], 'xgboost_imputed_' + str(dct_param['nrun']) + '.csv'), index=True)
 
 
     df_raw_data = descale(df_raw_data, df_col_mu_std, dct_data['lst_num_cols'])

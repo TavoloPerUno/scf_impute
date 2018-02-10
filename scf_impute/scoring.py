@@ -40,15 +40,16 @@ def get_mse(df_full_data, df_imputed, lst_num_cols, df_removed):
 
 
 def get_accuracy(df_full_data, df_imputed, lst_char_cols, df_removed):
-    y = pd.DataFrame(columns=['col', 'accuracy'])
+    y = pd.DataFrame(columns=['actual', 'imputed', 'col'])
     for col in set(lst_char_cols).intersection(set(df_removed.columns)):
         actual = df_full_data.loc[np.fromstring(str(df_removed[col].values[0]), dtype=int, sep=','), col].values
         imputed = df_imputed.loc[np.fromstring(str(df_removed[col].values[0]), dtype=int, sep=','), col].values
 
-        y = y.append(pd.DataFrame({'col': col,
-                                   'accuracy': accuracy_score(actual, imputed)}, index=[min(0, y.shape[0] - 1)]))
+        y = y.append(pd.DataFrame({'actual': actual,
+                                   'imputed': imputed,
+                                   'col': [col] * actual.shape[0]}))
 
-    return y, y['accuracy'].mean()
+    return y, accuracy_score(y['actual'], y['imputed'])
 
 
 def scale(df_raw_data, lst_num_cols):
