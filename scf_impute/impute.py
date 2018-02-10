@@ -43,7 +43,6 @@ def xgboost_impute(dct_data, dct_param):
         lst_cols_to_impute = [col for col in list(df_raw_data.columns[df_raw_data.isnull().any()]) if
                               col in lst_cols_to_impute]
 
-        lst_cols_to_impute = lst_cols_to_impute[0:3]
         if len(lst_cols_to_impute) < 1:
             break
 
@@ -61,7 +60,7 @@ def xgboost_impute(dct_data, dct_param):
             if char_col in df_raw_data.columns:
                 df_raw_data[char_col].fillna('nan', inplace=True)
 
-        df_raw_data['yy1'] = df_raw_data.index.copy()
+        # df_raw_data['index'] = df_raw_data.index.copy()
 
         for cols in lst_parts:
             imputer = DefaultImputer(missing_string_marker='nan', random_state=dct_param['nrun'] * 100,

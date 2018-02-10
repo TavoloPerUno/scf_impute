@@ -60,7 +60,9 @@ class MLImputer(object):
             self.base_classifier(), self.base_regressor(), self.base_imputer(), self.feature_encoder)
 
     def fit(self, df, y=False):
+        index_col = df.index.copy()
         df = self.feature_encoder.fit(df).transform(df)
+        df.index = index_col
         self.column_set = set(df.columns)
         if self.missing_features is None:
             self.missing_features = self.column_set
@@ -87,7 +89,7 @@ class MLImputer(object):
             else:
                 model = self.base_classifier(random_state=self.random_state, n_jobs=self.n_jobs)
 
-            X = df.get(feats)[~missing_mask(column)].reset_index(drop=True)
+            X = df.get(feats)[~missing_mask(column)]
             y = column[~missing_mask(column)].values
             if len(y) == 0:
                 raise ValueError(
@@ -100,6 +102,7 @@ class MLImputer(object):
         return self
 
     def transform(self, df, proba=False):
+        index_col = df.index.copy()
         df = self.feature_encoder.transform(df)
         result_dict = {}
         for col in self.column_set:
@@ -127,7 +130,7 @@ class MLImputer(object):
 
         transformed = self.feature_encoder.inverse_transform(
             pd.DataFrame(result_dict))
-        transformed.index = df.index.copy()
+        transformed.index = index_col
 
         return transformed
 
