@@ -54,7 +54,7 @@ def xgboost_impute(dct_data, dct_param):
 
         random.shuffle(lst_cols_to_impute)
 
-        lst_parts = [lst_cols_to_impute[x:x + 100] for x in range(0, len(lst_cols_to_impute), 100)]
+        lst_parts = [lst_cols_to_impute[x:x + 500] for x in range(0, len(lst_cols_to_impute), 500)]
 
         for char_col in lst_char_cols:
             if char_col in df_raw_data.columns:
@@ -70,7 +70,7 @@ def xgboost_impute(dct_data, dct_param):
             df_raw_data.to_csv(
                 os.path.join(dct_param['data'], 'xgboost_filled_' + str(dct_param['nrun']) + '.csv'), index=True)
             df_raw_data[cols] = df_filled[cols]
-            print("(%s of %s)" % (str(lst_cols_to_impute.index(lst_cols_to_impute[- 1])), str(len(lst_cols_to_impute))))
+            print("(%s of %s)" % (str(lst_cols_to_impute.index(cols[- 1])), str(len(lst_cols_to_impute))))
             df_raw_data.to_csv(
                 os.path.join(dct_param['data'], 'xgboost_imputed_' + str(dct_param['nrun']) + '.csv'), index=True)
 
