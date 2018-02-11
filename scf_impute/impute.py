@@ -58,7 +58,7 @@ def xgboost_impute(dct_data, dct_param):
 
         for char_col in lst_char_cols:
             if char_col in df_raw_data.columns:
-                df_raw_data[char_col].fillna('nan', inplace=True)
+                df_raw_data.loc[:,char_col].fillna('nan', inplace=True)
 
         # df_raw_data['index'] = df_raw_data.index.copy()
 

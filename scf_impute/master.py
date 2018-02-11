@@ -44,6 +44,7 @@ def prepare_for_upload(dct_data, df_raw_data):
 
     return df_raw_data
 
+
 def download_data():
 
     dct_data = dict()
@@ -136,7 +137,7 @@ def main(argv):
     with open(os.path.join(dct_param['data'], 'variables.pickle'), 'wb') as handle:
         pickle.dump(dct_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    df_imputed_with_analysis_variables = analysis_variables.fill_analysis_variables(dct_data, dct_param, df_imputed)
+    df_imputed_with_analysis_variables = analysis_variables.fill_analysis_variables(dct_data, df_imputed)
 
 
 

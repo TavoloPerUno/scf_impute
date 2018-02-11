@@ -3,6 +3,7 @@ import numpy as np
 from scf_impute import master
 from scf_impute import impute
 from sklearn.metrics import mean_squared_error, accuracy_score
+from scf_impute import analysis_variables
 
 def prepare_for_scores(dct_data, dct_param, df_imputed, nrun, with_impute=True):
 
@@ -15,8 +16,17 @@ def prepare_for_scores(dct_data, dct_param, df_imputed, nrun, with_impute=True):
 
     df_imputed = master.prepare_for_upload(dct_data, df_imputed)
 
+    lst_undesired_cols = dct_data['lst_skipped_cols'] + dct_data['empty_cols']
+
+    lst_nan_cols =  df_imputed.columns[df_imputed.isnull().any()]
+    for col in lst_nan_cols:
+        if col in lst_undesired_cols:
+            df_imputed.fillna([x for x in df_imputed[col].unique() if x != np.nan][0], inplace=True)
+
 
     df_imputed.set_index(dct_data['df_full_cleaned_data'].index, inplace=True)
+
+    df_imputed = analysis_variables.fill_analysis_variables(dct_data, df_imputed)
 
     return df_imputed
 

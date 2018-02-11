@@ -5,7 +5,10 @@ def get_full_df(dct_data, df_raw_data):
     df_orig_data = dct_data['df_orig_data']
 
     lst_skip_col = dct_data['lst_skipped_cols']
-    df_raw_data[lst_skip_col] = df_orig_data[lst_skip_col]
+    for col in lst_skip_col:
+        if col not in df_raw_data.columns:
+            df_raw_data[col] = df_orig_data[col]
+            df_raw_data[col].fillna([x for x in df_raw_data[col].unique() if x != np.nan][0], inplace=True)
 
     return df_raw_data
 
@@ -389,7 +392,7 @@ def get_networth(row):
 
     return row
 
-def fill_analysis_variables(dct_data, dct_param, df_raw_data):
+def fill_analysis_variables(dct_data, df_raw_data):
     df_raw_data = get_full_df(dct_data, df_raw_data)
     df_raw_data = df_raw_data.replace('nan', np.nan)
     df_raw_data = df_raw_data.apply(pd.to_numeric)
