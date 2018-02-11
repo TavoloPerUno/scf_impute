@@ -99,7 +99,7 @@ def glrm_impute(dct_data, dct_param):
     regX, regY = QuadraticReg(0.1), QuadraticReg(0.1)
     missing_list = [lst_missing_num, lst_missing_char]
 
-    c = Convergence(TOL=1e-3, max_iters=1000)
+    c = Convergence(TOL=1e-3, max_iters=10)
     model = GLRM(dat_list, loss_list, regX, regY, k, missing_list, converge=c)
     model.fit()
     X, Y = model.factors()
